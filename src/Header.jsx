@@ -16,7 +16,7 @@ function Header() {
     if (user === "" && password === "") {
       settext("Please fill in all the fields");
     } else if (!emailRegex.test(user)) {
-      settext("Please enter a vaild email address");
+      settext("Please Enter a valid email");
     } else if (password.length < 6) {
       settext("Password must be at least 6 characters");
     }
@@ -37,7 +37,7 @@ function Header() {
       return;
     }
     if (!emailRegex.test(user)) {
-      settext("Please enter a vaild email address");
+      settext("Please Enter a valid email");
     }
     else if (password.length < 6 && password !== "") {
       settext("Password must be greater than 6 characters");
