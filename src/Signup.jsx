@@ -8,6 +8,8 @@ function Signup() {
   const [password, setpassword] = useState("");
   const [confirmpassword, setconfirmpassword] = useState("");
   const [bool, setbool] = useState(false);
+  const [showterms, setshowterms] = useState(false);
+  const [context, setcontext] = useState(false);
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const navigate = useNavigate();
 
@@ -17,6 +19,9 @@ function Signup() {
       settext("Please Enter a valid email");
     } else if (password !== confirmpassword) {
       settext("Password is incorrect");
+    }
+     else if (!context) {
+      settext("Please check terms and conditions");
     } else {
       settext("Account Successfully Created");
       setTimeout(() => {
@@ -41,6 +46,7 @@ function Signup() {
   }, [email, password, confirmpassword]);
 
   return (
+    <>
     <div className="Body">
       <form className="Form2" onSubmit={handlevalidation}>
         <h1 className="h1">MaLan-Ai</h1>
@@ -52,13 +58,32 @@ function Signup() {
         <input type="password" className="input"value={confirmpassword} style={{ border: confirmpassword === "" ? "2px solid gray" : password === confirmpassword ? "2px solid green" : "2px solid red"}} onChange={(e) => setconfirmpassword(e.target.value)} placeholder="Enter Confirm Password"
         />
         {bool && (<p className="p" style={{ color: text === "Account Successfully Created" ? "green" : "red" }} >{text}</p>)}
+        <div className="row3"><input type="checkbox" value={context} onChange={(e) => setcontext(e.target.checked)} /><h3>I agree to <span class="terms" onClick={() => setshowterms(true)} >Terms and conditions</span></h3>
+          </div>
         <button className="buttonlogin" type="submit">Submit</button>
         <div className="row2">
           <p className="p">Have an existing account?</p>
           <button className="buttonlogin" type="button" onClick={() => navigate("/login")} >Log In</button>
         </div>
       </form>
+       {showterms &&
+          (
+            <div className="floating">
+              <div className="floating-content">
+                <h2>Terms & Conditions</h2>
+                <p>
+                  <ul>
+                    <li>a</li>
+                    <li>b</li>
+                    <li>c</li>
+                  </ul>
+                </p>
+                <button className="buttonlogin3" onClick={() => setshowterms(false)} >Close</button>
+              </div>
+            </div>
+          )}
     </div>
+    </>
   );
 }
 

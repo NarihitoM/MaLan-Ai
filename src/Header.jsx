@@ -63,7 +63,7 @@ function Header() {
           <button className="buttonlogin" type="submit">Log In</button>
           <div className="row2">
             <p className="p">Don't have an account?</p>
-            <button className="buttonlogin" type="button" onClick={() => setTimeout(() => (navigate("/signup")), 1000)} onKeyDown={(e) =>{if(e.key === "Enter") send(); }}>Sign Up</button>
+            <button className="buttonlogin" type="button" onClick={() => navigate("/signup")} onKeyDown={(e) =>{if(e.key === "Enter") send(); }}>Sign Up</button>
           </div>
         </form>
         {showterms &&

@@ -15,6 +15,16 @@
     border: 1px solid #ccc;
     width: 100%;
 }
+.head
+{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.loginpage
+{
+  align-self: center;
+}
 .input-area {
     position: relative;      
     width: 50%;           
@@ -132,6 +142,22 @@
     transition: all 0.2s ease-in-out;
 }
 .gotologinpage:hover
+{
+    background-color: gray;
+    transition: all 0.2s ease-in-out;
+}
+.gotosignpage
+{
+    align-self: center;
+    padding: 10px;
+    margin-right: 10px;
+     background-color: #000000;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    transition: all 0.2s ease-in-out;
+}
+.gotosignpage:hover
 {
     background-color: gray;
     transition: all 0.2s ease-in-out;

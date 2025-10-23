@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import "./chat.css"
 import { useEffect, useRef, useState } from "react";
 function Chat() {
- 
+
   const [userInput, setUserInput] = useState("");
-  const [messagetext, setmessagetext] = useState([{text: "Hello How Can I Help You?"}]);
+  const [messagetext, setmessagetext] = useState([{ text: "Hello How Can I Help You?" }]);
   const fovmessage = useRef(null);
-   const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const send = () => {
     if (userInput.trim() === "") return;
@@ -18,24 +18,28 @@ function Chat() {
     setTimeout(() => {
       setmessagetext((previoustext) => [
         ...previoustext,
-        { sender: "Bot", text: "Hello! I'm Testing Ai" /* Link Bot Token */}
+        { sender: "Bot", text: "Hello! I'm Testing Ai" /* Link Bot Token */ }
       ]);
     }, 400);
     setUserInput("");
   };
 
-  useEffect(() =>
-  {
-    fovmessage.current?.scrollIntoView({behaviour: "smooth"})
-  },[messagetext]);
+  useEffect(() => {
+    fovmessage.current?.scrollIntoView({ behaviour: "smooth" })
+  }, [messagetext]);
 
- 
-return (
+
+  return (
     <>
-       <div className="row">
-         <h1 className="h1">MaLan-Ai</h1>
-         <button className="gotologinpage" onClick={() => navigate("/")}>Login</button>
-       </div>
+      <div className="head">
+        <div className="row">
+          <h1 className="h1">MaLan-Ai</h1>
+        </div>
+        <div className="loginpage">
+          <button className="gotologinpage" onClick={() => navigate("/")}>Login</button>
+          <button className="gotosignpage" onClick={() => navigate("/signup")}>Sign Up</button>
+        </div>
+      </div>
       <div className="container">
         <div className="chat-window">
           <div className="messages">
