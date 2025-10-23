@@ -10,12 +10,13 @@ function Header() {
   const [showterms, setshowterms] = useState(false);
   const [context, setcontext] = useState(false);
   const navigate = useNavigate();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const Handlevalidation = (e) => {
     e.preventDefault();
     if (user === "" && password === "") {
       settext("Please fill in all the fields");
-    } else if (user.length < 3) {
-      settext("Username must be at least 3 characters");
+    } else if (!emailRegex.test(user)) {
+      settext("Please enter a vaild email address");
     } else if (password.length < 6) {
       settext("Password must be at least 6 characters");
     }
@@ -35,10 +36,10 @@ function Header() {
       settext("");
       return;
     }
-    if (user.length < 3) {
-      settext("Username must be greater than 3 characters");
+    if (!emailRegex.test(user)) {
+      settext("Please enter a vaild email address");
     }
-    else if (password.length < 6) {
+    else if (password.length < 6 && password !== "") {
       settext("Password must be greater than 6 characters");
     }
     else {
@@ -51,8 +52,8 @@ function Header() {
       <div className="Body">
         <form onSubmit={Handlevalidation} className="Form">
           <h1 className="h1">MaLan-Ai</h1>
-          <label className="label">Enter Username</label>
-          <input className="input" type="text" style={{ border: user === "" ? "2px solid gray" : user.length >= 3 ? "2px solid green" : "2px solid red" }} value={user} placeholder="Enter username" onChange={(e) => setuser(e.target.value)} />
+          <label className="label">Enter Email</label>
+          <input className="input" type="text" style={{ border: user === "" ? "2px solid gray" : emailRegex.test(user) ? "2px solid green" : "2px solid red" }} value={user} placeholder="Enter Email" onChange={(e) => setuser(e.target.value)} />
           <label className="label">Enter Password</label>
           <input className="input" type="password" style={{ border: password === "" ? "2px solid gray" : password.length >= 6 ? "2px solid green" : "2px solid red" }} value={password} placeholder="Enter password" onChange={(e) => setpassword(e.target.value)} />
           {bool && (
@@ -71,13 +72,13 @@ function Header() {
             <div className="floating">
               <div className="floating-content">
                 <h2>Terms & Conditions</h2>
-                <p>
-                  <ul>
+            
+                  <ol type="I">
                     <li>a</li>
                     <li>b</li>
                     <li>c</li>
-                  </ul>
-                </p>
+                  </ol>
+                
                 <button className="buttonlogin3" onClick={() => setshowterms(false)} >Close</button>
               </div>
             </div>

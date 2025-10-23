@@ -15,7 +15,9 @@ function Signup() {
 
   const handlevalidation = (e) => {
     e.preventDefault();
-    if (!emailRegex.test(email)) {
+    if(email === "" && password === "" && confirmpassword === "") {
+      settext("Please fill in all the fields");
+    } else if (!emailRegex.test(email)) {
       settext("Please Enter a valid email");
     } else if (password !== confirmpassword) {
       settext("Password is incorrect");
@@ -60,7 +62,7 @@ function Signup() {
         {bool && (<p className="p" style={{ color: text === "Account Successfully Created" ? "green" : "red" }} >{text}</p>)}
         <div className="row3"><input type="checkbox" value={context} onChange={(e) => setcontext(e.target.checked)} /><h3>I agree to <span class="terms" onClick={() => setshowterms(true)} >Terms and conditions</span></h3>
           </div>
-        <button className="buttonlogin" type="submit">Submit</button>
+        <button className="buttonlogin" type="submit">Create Account with MaLan-Ai</button>
         <div className="row2">
           <p className="p">Have an existing account?</p>
           <button className="buttonlogin" type="button" onClick={() => navigate("/login")} >Log In</button>
@@ -71,14 +73,14 @@ function Signup() {
             <div className="floating">
               <div className="floating-content">
                 <h2>Terms & Conditions</h2>
-                <p>
-                  <ul>
+               
+                  <ol type="I">
                     <li>a</li>
                     <li>b</li>
                     <li>c</li>
-                  </ul>
-                </p>
-                <button className="buttonlogin3" onClick={() => setshowterms(false)} >Close</button>
+                  </ol>
+               
+                <button className="buttonlogin3" onClick={() => setshowterms(false)}>Close</button>
               </div>
             </div>
           )}
