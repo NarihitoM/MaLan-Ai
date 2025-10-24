@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
+import {useGoogleLogin} from "@react-oauth/google";
 
 function Signup() {
   const [text, settext] = useState("");
@@ -31,7 +32,20 @@ function Signup() {
       }, 5000);
     }
   };
-
+  const googlelogin = useGoogleLogin({
+    onSuccess: (/* to link the account to backend for calling function */) => {
+      settext("Google Account Successfully Created");
+      setbool(true);
+      setTimeout(() => {
+        navigate("/chat");
+      }, 3000);
+    },
+    onError: () =>
+    {
+      settext("Google Sign Up Failed");
+      setbool(true);
+    }
+  })
   useEffect(() => {
     if(email === "" && password === "" && confirmpassword === "")
     {setbool(true);
@@ -59,10 +73,13 @@ function Signup() {
         <label className="label">Confirm Password</label>
         <input type="password" className="input"value={confirmpassword} style={{ border: confirmpassword === "" ? "2px solid gray" : password === confirmpassword ? "2px solid green" : "2px solid red"}} onChange={(e) => setconfirmpassword(e.target.value)} placeholder="Enter Confirm Password"
         />
-        {bool && (<p className="p" style={{ color: text === "Account Successfully Created" ? "green" : "red" }} >{text}</p>)}
+        {bool && (<p className="p" style={{ color: text === "Account Successfully Created" || text === "Google Account Successfully Created" ? "green" : "red" }} >{text}</p>)}
         <div className="row3"><input type="checkbox" value={context} onChange={(e) => setcontext(e.target.checked)} /><h3>I agree to <span class="terms" onClick={() => setshowterms(true)} >Terms and conditions</span></h3>
           </div>
         <button className="buttonlogin" type="submit">Create Account with MaLan-Ai</button>
+        <button className="buttonlogin1" type="button" onClick={googlelogin}>
+        <i class="fa-brands fa-google"></i> &nbsp; Create Account with Google
+        </button>
         <div className="row2">
           <p className="p">Have an existing account?</p>
           <button className="buttonlogin" type="button" onClick={() => navigate("/login")} >Log In</button>

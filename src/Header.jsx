@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./index.css"
 import { useNavigate } from "react-router-dom";
+import {useGoogleLogin} from "@react-oauth/google";
 
 function Header() {
   const [user, setuser] = useState("");
@@ -9,6 +10,9 @@ function Header() {
   const [bool, setbool] = useState(false);
   const [showterms, setshowterms] = useState(false);
   const [context, setcontext] = useState(false);
+
+  
+
   const navigate = useNavigate();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const Handlevalidation = (e) => {
@@ -30,6 +34,21 @@ function Header() {
     }
 
   };
+
+  const googlelogin = useGoogleLogin({
+    onSuccess: (/* to link the account to backend for calling function */) => {
+      settext("Google Account Successfully Logged In");
+      setbool(true);
+      setTimeout(() => {
+        navigate("/chat");
+      }, 3000);
+    },
+    onError: () =>
+    {
+      settext("Google Sign Up Failed");
+      setbool(true);
+    }
+  })
   useEffect(() => {
     if (user === "" && password === "") {
       setbool(true);
@@ -57,11 +76,13 @@ function Header() {
           <label className="label">Enter Password</label>
           <input className="input" type="password" style={{ border: password === "" ? "2px solid gray" : password.length >= 6 ? "2px solid green" : "2px solid red" }} value={password} placeholder="Enter password" onChange={(e) => setpassword(e.target.value)} />
           {bool && (
-            <p className="p" style={{ color: text === "Login Successful" ? "green" : "red" }}>{text}</p>
+            <p className="p" style={{ color: text === "Login Successful" || text === "Google Account Successfully Logged In" ? "green" : "red" }}>{text}</p>
           )}
           <div className="row3"><input type="checkbox" value={context} onChange={(e) => setcontext(e.target.checked)} /><h3>I agree to <span class="terms" onClick={() => setshowterms(true)} >Terms and conditions</span></h3>
           </div>
           <button className="buttonlogin" type="submit">Log In</button>
+          <button className="buttonlogin1" type="button" onClick={googlelogin}>
+            <i class="fa-brands fa-google"></i> &nbsp; Login with Google</button>
           <div className="row2">
             <p className="p">Don't have an account?</p>
             <button className="buttonlogin" type="button" onClick={() => navigate("/signup")} onKeyDown={(e) =>{if(e.key === "Enter") send(); }}>Sign Up</button>
