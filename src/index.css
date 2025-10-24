@@ -33,13 +33,13 @@
 
 .h1 {
   text-align: center;
+ 
 }
 
 .input {
   padding: 10px;
   border-radius: 10px;
   box-sizing: border-box;
-
 }
 
 .input:focus {
@@ -141,4 +141,23 @@
 .terms{
   cursor: pointer;
   text-decoration: underline;
+}
+.profile-pic
+{
+   border-radius: 50%;
+   width: 30px;
+   height: 30px;
+   align-self: center;
+}
+.h1pf
+{
+    font-family: 'Montserrat',serif;
+    font-size: 20px;
+    align-self: center;
+}
+.h1pf2
+{
+    font-family: 'Montserrat',serif;
+    font-size: 15px;
+    align-self: center;
 }

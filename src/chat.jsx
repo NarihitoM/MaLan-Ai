@@ -8,7 +8,32 @@ function Chat() {
   const [messagetext, setmessagetext] = useState([{ text: "Hello How Can I Help You?" }]);
   const fovmessage = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoggedin, setloggedin] = useState(false);
+  const [photo, setPhoto] = useState("");
+  const [name, setName] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const isuserinthesystem = localStorage.getItem("keepLoggedIn");
+    if (isuserinthesystem) {
+      setloggedin(true);
+      setPhoto(localStorage.getItem("googlepicture") || "");
+      setName(localStorage.getItem("googlename") || "");
+    }
+    else {
+      setloggedin(false);
+    }
+  }, [isLoggedin,name,photo]);
+
+  useEffect(() =>
+  {
+     setPhoto(localStorage.getItem("googlepicture"))
+  },[photo]);
+  
+  const logout = () => {
+    localStorage.clear();
+    navigate("/login");
+  }
   const send = () => {
     if (userInput.trim() === "") return;
     setmessagetext((previoustext) => [
@@ -28,7 +53,6 @@ function Chat() {
     fovmessage.current?.scrollIntoView({ behaviour: "smooth" })
   }, [messagetext]);
 
-
   return (
     <>
       <div className="head">
@@ -36,8 +60,25 @@ function Chat() {
           <h1 className="h1">MaLan-Ai</h1>
         </div>
         <div className="loginpage">
-          <button className="gotologinpage" onClick={() => navigate("/")}>Login</button>
-          <button className="gotosignpage" onClick={() => navigate("/signup")}>Sign Up</button>
+          <div className="row">
+            {isLoggedin ?
+              (<>
+                <h1 className="h1pf2">{localStorage.getItem("email")}</h1>
+                <h1 className="h1pf">{localStorage.getItem("googlename")}</h1>
+                <img
+                  src={photo}
+                  alt="Profile"
+                  className="profile-pic"
+                />
+                <button className="gotologinpage" onClick={logout}>Logout</button>
+              </>)
+              :
+              (<>
+                <button className="gotologinpage" onClick={() => navigate("/")}>Login</button>
+                <button className="gotosignpage" onClick={() => navigate("/signup")}>Sign Up</button>
+              </>)
+            }
+          </div>
         </div>
       </div>
       <div className="container">

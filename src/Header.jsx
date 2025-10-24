@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import "./index.css"
 import { useNavigate } from "react-router-dom";
-import {useGoogleLogin} from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 
 function Header() {
   const [user, setuser] = useState("");
@@ -10,9 +11,6 @@ function Header() {
   const [bool, setbool] = useState(false);
   const [showterms, setshowterms] = useState(false);
   const [context, setcontext] = useState(false);
-
-  
-
   const navigate = useNavigate();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const Handlevalidation = (e) => {
@@ -28,27 +26,61 @@ function Header() {
       settext("Please check terms and conditions");
     }
     else {
-      settext("Login Successful");
-      setbool(true);
-      setTimeout(() => navigate("/chat"), 3000);
+      try {
+        let testemail = "hha@gmail.com";
+        let testpassword = "hha281005";
+        const response = { email: user, password: password }
+        if (response.email === testemail && response.password === testpassword) {
+          settext("Login Successful");
+          setbool(true);
+          localStorage.setItem("email", user);
+          localStorage.setItem("keepLoggedIn", JSON.stringify(true));
+          setTimeout(() => {
+            navigate("/chat");
+          }, 2000);
+        }
+        else {
+          settext("Login Failed");
+          setbool(true);
+        }
+      }
+      catch (error) {
+        settext("An error occurred during login");
+      }
     }
-
   };
 
   const googlelogin = useGoogleLogin({
-    onSuccess: (/* to link the account to backend for calling function */) => {
-      settext("Google Account Successfully Logged In");
-      setbool(true);
-      setTimeout(() => {
-        navigate("/chat");
-      }, 3000);
+    onSuccess: async (tokenResponse) => {
+      try {
+        console.log("Google login success:", tokenResponse);
+
+        const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: {
+            Authorization: `Bearer ${tokenResponse.access_token}`,
+          },
+        });
+        settext("Google Account Successfully Logged In");
+        setbool(true);
+        localStorage.setItem("googleemail", res.data.email);
+        localStorage.setItem("googlename", res.data.name);
+        localStorage.setItem("googlepicture", res.data.picture);
+        localStorage.setItem("keepLoggedIn", JSON.stringify(true));
+        console.log("Google picture URL:", res.data.picture);
+        setTimeout(() => navigate("/chat"), 1000);
+      }
+      catch (error) {
+        console.error("Error fetching Google user info:", error);
+        settext('Fail to logged in');
+        setbool(true);
+      }
     },
-    onError: () =>
-    {
-      settext("Google Sign Up Failed");
+    onError: () => {
+      settext("Google Login Failed");
       setbool(true);
-    }
-  })
+    },
+  });
+
   useEffect(() => {
     if (user === "" && password === "") {
       setbool(true);
@@ -85,7 +117,7 @@ function Header() {
             <i class="fa-brands fa-google"></i> &nbsp; Login with Google</button>
           <div className="row2">
             <p className="p">Don't have an account?</p>
-            <button className="buttonlogin" type="button" onClick={() => navigate("/signup")} onKeyDown={(e) =>{if(e.key === "Enter") send(); }}>Sign Up</button>
+            <button className="buttonlogin" type="button" onClick={() => navigate("/signup")} onKeyDown={(e) => { if (e.key === "Enter") send(); }}>Sign Up</button>
           </div>
         </form>
         {showterms &&
@@ -93,13 +125,11 @@ function Header() {
             <div className="floating">
               <div className="floating-content">
                 <h2>Terms & Conditions</h2>
-            
-                  <ol type="I">
-                    <li>a</li>
-                    <li>b</li>
-                    <li>c</li>
-                  </ol>
-                
+                <ol type="I">
+                  <li>a</li>
+                  <li>b</li>
+                  <li>c</li>
+                </ol>
                 <button className="buttonlogin3" onClick={() => setshowterms(false)} >Close</button>
               </div>
             </div>
