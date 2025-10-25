@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import "./chat.css"
 import { useEffect, useRef, useState } from "react";
 function Chat() {
-
   const [userInput, setUserInput] = useState("");
   const [messagetext, setmessagetext] = useState([{ text: "Hello How Can I Help You?" }]);
   const fovmessage = useRef(null);
