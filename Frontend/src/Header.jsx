@@ -13,7 +13,7 @@ function Header() {
   const [context, setcontext] = useState(false);
   const navigate = useNavigate();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const Handlevalidation = (e) => {
+  const Handlevalidation = (e) => {     
     e.preventDefault();
     if (user === "" && password === "") {
       settext("Please fill in all the fields");
@@ -26,6 +26,20 @@ function Header() {
       settext("Please check terms and conditions");
     }
     else {
+      
+    // change to const Handlevalidation = async (e) when using this ///
+   /* try {
+      const response = await axios.post("http://localhost:5000/signup", {
+        email: user,
+        password: password,
+      });
+      settext(response.data.message); // show backend response
+    } catch (error) {
+      console.error(error);
+      settext("Login Failed"); // show error
+    }
+  */
+ 
       try {
         let testemail = "hha@gmail.com";
         let testpassword = "hha281005";
@@ -46,7 +60,7 @@ function Header() {
       }
       catch (error) {
         settext("An error occurred during login");
-      }
+      } 
     }
   };
 
