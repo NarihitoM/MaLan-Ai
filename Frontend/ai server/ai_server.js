@@ -1,4 +1,3 @@
-// ai_server.js
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -9,16 +8,13 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// ⚠️ Never hardcode tokens in production
 const token = "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";
 
-// Create model client
 const client = ModelClient(
   "https://models.github.ai/inference",
   new AzureKeyCredential(token)
 );
 
-// Chat endpoint
 app.post("/api/chat", async (req, res) => {
   const userMessage = req.body.message || "";
   const timestamp = new Date().toISOString();
@@ -51,7 +47,6 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-// Start server
 const PORT = 4200;
 app.listen(PORT, () => console.log(`AI server running on port ${PORT}`));
 
