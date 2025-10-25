@@ -34,19 +34,42 @@ function Chat() {
     localStorage.clear();
     navigate("/login");
   }
-  const send = () => {
+  const send = async() => {
     if (userInput.trim() === "") return;
     setmessagetext((previoustext) => [
       ...previoustext,
       { sender: "user", text: userInput }
     ]);
-    setTimeout(() => {
-      setmessagetext((previoustext) => [
+    setIsLoading(true);
+    const payload = { message: userInput};
+    try {
+      const resp = await fetch("http://localhost:4000/api/chat",{
+        method: "POST",
+        headers: { "Content-Type": "application/json"},
+        body: JSON.stringify(payload),
+      });
+      if(!resp.ok){
+        const errBody = await resp.json().catch(()=> ({}));
+        throw new Error(errBody.error || `Server returned ${resp.status}`);
+      }
+      const data = await resp.json();
+      const botReply = data.reply || "No response from server";
+      setmessagetext((previoustext)=>[
         ...previoustext,
-        { sender: "Bot", text: "Hello! I'm Testing Ai" /* Link Bot Token */ }
+        { sender: "Bot", text: botReply}
       ]);
-    }, 400);
-    setUserInput("");
+    }
+    catch(err){
+      console.error("chat error", err);
+      setmessagetext((previoustext)=>[
+        ...previoustext,
+        { sender: "Bot", text: "Error could not reach chat server."}
+      ]);
+    }
+    finally{
+      setIsLoading(false);
+      setUserInput("");
+    }
   };
 
   useEffect(() => {
