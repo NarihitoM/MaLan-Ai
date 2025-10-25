@@ -31,8 +31,8 @@ app.post("/api/chat", async (req, res) => {
     const response = await client.path("/chat/completions").post({
       body: {
         messages: [{ role: "user", content: userMessage }],
-        model: "deepseek/DeepSeek-R1",
-        max_tokens: 2048,
+        model: "mistral-ai/mistral-small-2503",
+        max_tokens: 512,
       },
     });
 
@@ -52,6 +52,6 @@ app.post("/api/chat", async (req, res) => {
 });
 
 // Start server
-const PORT = 4000;
+const PORT = 4200;
 app.listen(PORT, () => console.log(`AI server running on port ${PORT}`));
 

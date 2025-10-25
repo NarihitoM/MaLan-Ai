@@ -42,7 +42,7 @@ function Chat() {
     setIsLoading(true);
     const payload = { message: userInput};
     try {
-      const resp = await fetch("http://localhost:4000/api/chat",{
+      const resp = await fetch("http://localhost:4200/api/chat",{
         method: "POST",
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify(payload),
@@ -117,7 +117,7 @@ function Chat() {
             <div ref={fovmessage}></div>
           </div>
           <div className="row1">
-            <h1 className="copyright">@Copyright 2025 MeLan-Ai</h1>
+            <h1 className="copyright">@Copyright 2025 MaLan-Ai</h1>
             <div className="input-area">
               <input
                 className="input"
