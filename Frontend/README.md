@@ -2,4 +2,4 @@
 
 This is the development of our MaLan-Ai Project.
 
-# Made By Narihito, Riae and FangYuan.
+# Made By Narihito, Riae.
