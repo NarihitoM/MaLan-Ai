@@ -8,3 +8,8 @@ first install node
                                 |__then type the command
                                     |__npm run dev
                                         |__go to the localhost it displayed
+                                           |__db in development
+
+Team MaLan-Ai: 
+Narihito,Riae.
+Thank You
