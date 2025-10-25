@@ -124,13 +124,11 @@ function Signup() {
             <div className="floating">
               <div className="floating-content">
                 <h2>Terms & Conditions</h2>
-               
                   <ol type="I">
                     <li>a</li>
                     <li>b</li>
                     <li>c</li>
                   </ol>
-               
                 <button className="buttonlogin3" onClick={() => setshowterms(false)}>Close</button>
               </div>
             </div>
