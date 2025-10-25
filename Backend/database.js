@@ -1,7 +1,7 @@
 const express = require('express');
 const mysql = require('mysql');
 const cors = require('cors');
-
+const jwt = require("jsonwebtoken");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -9,11 +9,34 @@ app.use(express.urlencoded({ extended: false }));
 
 // MySQL database connection //
 const db = mysql.createConnection({
-    host: "",
-    user: "",
+    host: "localhost",
+    user: "root",
     password: "",
-    database: ""
+    database: "malan-ai"
 });
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+  // Find user in database
+  db.query(
+    "SELECT * FROM users WHERE email = ?",
+    [email],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: "Server error" });
+      }
+      if (results.length === 0) {
+        return res.status(400).json({ success: false, message: "Incorrect Email And Password" });
+      }
+      const user = results[0];
+      if (user.password !== password) {
+        return res.status(401).json({ success: false, message: "Incorrect Email And Password" });
+      }
+      res.status(200).json({ success: true, message: "Login successful", email: user.email });
+    }
+  );
+});
+
 
 app.post("/signup", (req, res) => {
     const { email, password } = req.body;
@@ -26,8 +49,9 @@ app.post("/signup", (req, res) => {
                 console.log(result);
                 res.status(500).send("Error saving user.");
             } else {
+                
                 res.status(200).json({
-                    message: "User registered successfully",
+                    message: "Registered successfully",
                     email,
                     password
                 });
@@ -38,23 +62,24 @@ app.post("/signup", (req, res) => {
 
 app.post("/google-signup", (req, res) => {
     const { email, name, picture, googleId } = req.body;
-
     db.query(
         `INSERT INTO users (email, name, picture, google_id)
          VALUES (?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE name = VALUES(name), picture = VALUES(picture)`,
-        [email, name, picture, googleId, name, picture],
+        [email, name, picture, googleId],
         (err, result) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ message: "Error saving Google user" });
             }
+            const token = jwt.sign({ email, googleId }, "1049755586928-v3vu7imnscl9cod3qq9vi6k43ohpsht4.apps.googleusercontent.com", { expiresIn: "1h" });
             res.status(200).json({
-                message: "Google Account registered successfully",
+                message: "Google Login Successful",
                 email,
                 name,
                 picture,
-                googleId
+                googleId,
+                token,
             });
         }
     );

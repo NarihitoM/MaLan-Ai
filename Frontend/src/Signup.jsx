@@ -2,6 +2,7 @@ import { useState, useEffect, use } from "react";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import {useGoogleLogin} from "@react-oauth/google";
+import axios from "axios";
 
 function Signup() {
   const [text, settext] = useState("");
@@ -14,7 +15,7 @@ function Signup() {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const navigate = useNavigate();
 
-  const handlevalidation = (e) => {
+  const handlevalidation = async (e) => {
     e.preventDefault();
     if(email === "" && password === "" && confirmpassword === "") {
       settext("Please fill in all the fields");
@@ -26,26 +27,59 @@ function Signup() {
      else if (!context) {
       settext("Please check terms and conditions");
     } else {
-      settext("Account Successfully Created");
+       try 
+       {
+      const response = await axios.post("http://localhost:5000/signup", {
+        email: email,
+        password: password,
+      });
+      settext(response.data.message);
       setTimeout(() => {
-        navigate("/login");
-      }, 5000);
+         navigate("/login");
+      }, 2000);
+    } catch (error) {
+      console.error(error);
+      settext("Sign Up Failed");
+    }
     }
   };
+
   const googlelogin = useGoogleLogin({
-    onSuccess: (/* to link the account to backend for calling function */) => {
-      settext("Google Account Successfully Created");
+  onSuccess: async (response) => {
+    try {
+      const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: { Authorization: `Bearer ${response.access_token}` },
+      });
+      const profile = await userInfoRes.json();
+      const backendRes = await axios.post("http://localhost:5000/google-signup", {
+        email: profile.email,
+        name: profile.name,
+        picture: profile.picture,
+        googleId: profile.sub, 
+      });
+      settext(backendRes.data.message);
       setbool(true);
+       localStorage.setItem("googleemail", backendRes.data.email);
+        localStorage.setItem("googlename", backendRes.data.name);
+        localStorage.setItem("googlepicture",backendRes.data.picture);
+        localStorage.setItem("keepLoggedIn", JSON.stringify(true));
+        console.log("Google picture URL:", backendRes.data.picture);
       setTimeout(() => {
         navigate("/chat");
       }, 3000);
-    },
-    onError: () =>
-    {
+    } catch (error) {
+      console.error(error);
       settext("Google Sign Up Failed");
       setbool(true);
     }
-  })
+  },
+  onError: () => {
+    settext("Google Sign Up Failed");
+    setbool(true);
+  },
+});
+
+
   useEffect(() => {
     if(email === "" && password === "" && confirmpassword === "")
     {setbool(true);
@@ -73,12 +107,12 @@ function Signup() {
         <label className="label">Confirm Password</label>
         <input type="password" className="input"value={confirmpassword} style={{ border: confirmpassword === "" ? "2px solid gray" : password === confirmpassword ? "2px solid green" : "2px solid red"}} onChange={(e) => setconfirmpassword(e.target.value)} placeholder="Enter Confirm Password"
         />
-        {bool && (<p className="p" style={{ color: text === "Account Successfully Created" || text === "Google Account Successfully Created" ? "green" : "red" }} >{text}</p>)}
+        {bool && (<p className="p" style={{ color: text === "Account Successfully Created" || text === "Google Login Successful" ? "green" : "red" }} >{text}</p>)}
         <div className="row3"><input type="checkbox" value={context} onChange={(e) => setcontext(e.target.checked)} /><h3>I agree to <span class="terms" onClick={() => setshowterms(true)} >Terms and conditions</span></h3>
           </div>
         <button className="buttonlogin" type="submit">Create Account with MaLan-Ai</button>
         <button className="buttonlogin1" type="button" onClick={googlelogin}>
-        <i class="fa-brands fa-google"></i> &nbsp; Create Account with Google
+        <i class="fa-brands fa-google"></i> &nbsp; Login with Google
         </button>
         <div className="row2">
           <p className="p">Have an existing account?</p>
