@@ -16,7 +16,6 @@ const db = mysql.createConnection({
 });
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  // Find user in database
   db.query(
     "SELECT * FROM users WHERE email = ?",
     [email],
@@ -49,7 +48,6 @@ app.post("/signup", (req, res) => {
                 console.log(result);
                 res.status(500).send("Error saving user.");
             } else {
-                
                 res.status(200).json({
                     message: "Registered successfully",
                     email,
