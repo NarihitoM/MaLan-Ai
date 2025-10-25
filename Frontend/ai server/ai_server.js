@@ -32,7 +32,7 @@ app.post("/api/chat", async (req, res) => {
       body: {
         messages: [{ role: "user", content: userMessage }],
         model: "deepseek/DeepSeek-R1",
-        max_tokens: 2048,
+        max_tokens: 10000,
       },
     });
 
