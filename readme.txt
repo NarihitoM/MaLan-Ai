@@ -10,6 +10,6 @@ first install node
                                         |__go to the localhost it displayed
                                            |__db in development
 
-Team MaLan-Ai: 
-Narihito,Riae.
-Thank You
+# Team MaLan-Ai: 
+# Narihito,Riae.
+# Thank You
