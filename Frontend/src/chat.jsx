@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 function Chat() {
   const [userInput, setUserInput] = useState("");
+  const [file, setFile] = useState(null)
+  const fileInputRef = useRef(null)
   const [messagetext, setmessagetext] = useState([
     { text: "Start Chatting MaLan-Ai" },
   ]);
@@ -35,7 +37,7 @@ function Chat() {
   };
 
   const send = async () => {
-    if (userInput.trim() === "") return;
+    if (userInput.trim() === "" && !file) return;
 
     stopTypingRef.current = false;
 
@@ -47,14 +49,22 @@ function Chat() {
     const signal = controller.signal;
 
     const payload = { message: userInput };
-
+    let fetchOptions = {
+      method: "POST",
+      signal,
+    };
+    if (file) {
+      const form = new FormData();
+      form.append("message", userInput);
+      form.append("file", file);
+      fetchOptions.body = form;
+    }
+    else {
+      fetchOptions.headers = { "Content-Type": "application/json" }
+      fetchOptions.body = JSON.stringify({ message: userInput });
+    }
     try {
-      const resp = await fetch("http://localhost:4200/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal,
-      });
+      const resp = await fetch("http://localhost:4200/api/chat", fetchOptions);
 
       if (!resp.ok) {
         const errBody = await resp.json().catch(() => ({}));
@@ -195,46 +205,57 @@ function Chat() {
 
           <div className="row1">
             <h1 className="copyright">@Copyright 2025 MaLan-AI</h1>
-            {isLoggedin ? (
-              <div className="input-area">
-                <input
-                  className="input"
-                  type="text"
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && userInput.trim() !== "" && !isLoading) {
-                      if (istyping) stopgenerate();
-                      else
-                      send();
-                    }
-                  }}
-                  placeholder="Ask Anything..."
-                />
-                <button
-                  className="button"
-                  onClick={() => {
+            <div className="input-area">
+              <input
+                className="input"
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && userInput.trim() !== "" && !isLoading) {
                     if (istyping) stopgenerate();
-                    else send();
-                  }}
-                  disabled={userInput.trim() === "" || isLoading}
-                >
-                  {istyping ? (
-                    <div className="circle"></div>
-                  ) : isLoading ? (
-                    "Sending..."
-                  ) : (
-                    "Send"
-                  )}
-                </button>
-              </div>
-            ) : (
-              <div className="input-area">
-                <h1 className="warning">
-                  Please Log In or Sign Up to continue
-                </h1>
-              </div>
-            )}
+                    else
+                      send();
+                  }
+                }}
+                placeholder="Ask Anything..."
+              />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={(e) => setFile(e.target.files[0])}
+                style={{ display: "none" }}
+              />
+              <button
+                className="upload-btn"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                📎
+              </button>
+              {file && (
+                <p className="filename">
+                  📎 {file.name}
+                </p>
+              )}
+
+
+              <button
+                className="button"
+                onClick={() => {
+                  if (istyping) stopgenerate();
+                  else send();
+                }}
+                disabled={userInput.trim() === "" && !file || isLoading}
+              >
+                {istyping ? (
+                  <div className="circle"></div>
+                ) : isLoading ? (
+                  "Sending..."
+                ) : (
+                  "Send"
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
