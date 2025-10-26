@@ -135,9 +135,7 @@ function Chat() {
           <div className="row1">
             <h1 className="copyright">@Copyright 2025 MaLan-Ai</h1>
           <div className="input-area">
-          {isLoggedin ? 
-               (<>
-               <input
+          <input
                 className="input"
                 type="text"
                 value={userInput}
@@ -148,12 +146,7 @@ function Chat() {
               />
                <button className="button" onClick={send} disabled={userInput.trim() === "" || isLoading}>
                 {isLoading ? "Sending..." : "Send"}
-              </button> : 
-              </>) :
-              (<>
-               <h1 className="warning">Please Log In or SignUp to continue</h1>
-              </>)
-                }  
+              </button>  
             </div>
           </div>
         </div>
