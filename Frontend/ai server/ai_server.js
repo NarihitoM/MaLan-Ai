@@ -26,13 +26,20 @@ app.post("/api/chat", async (req, res) => {
   try {
     const response = await client.path("/chat/completions").post({
       body: {
-        messages: [{ role: "user", content: userMessage }],
-        model: "mistral-ai/mistral-small-2503",
+        messages: [
+          { role: "system", content: "" },
+          { role: "user", content: userMessage }
+        ],
+        model: "meta/Llama-3.3-70B-Instruct",
+        temperature: 0.8,
         max_tokens: 512,
-      },
+        top_p: 0.1
+      }
     });
 
-    if (isUnexpected(response)) throw response.body.error;
+    if (isUnexpected(response)) {
+      throw response.body.error;
+    }
 
     let aiReply = response.body.choices[0].message.content || "";
 
@@ -50,8 +57,8 @@ app.post("/api/chat", async (req, res) => {
       { regex: /(console\.write|System\.Console|using )/, label: "fsharp" },
       { regex: /(package |import |func )/, label: "kotlin" },
     ];
-
-    if (!/```[\s\S]*?```/.test(aiReply)) {
+    const isCodeLike = /[{}();=]|^\s{4,}/m.test(aiReply);
+    if (!/```[\s\S]*?```/.test(aiReply) && isCodeLike) {
       let detected = false;
       for (let lang of languageMap) {
         if (lang.regex.test(aiReply)) {
