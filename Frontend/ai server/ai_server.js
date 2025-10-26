@@ -48,7 +48,6 @@ app.post("/api/chat", async (req, res) => {
       { regex: /(using |namespace |class |static )/, label: "csharp" },
       { regex: /(int |float |double |printf|scanf)/, label: "c" },
       { regex: /(console\.write|System\.Console|using )/, label: "fsharp" },
-      { regex: /(BEGIN|END|IF|THEN|ELSE)/i, label: "pascal" },
       { regex: /(package |import |func )/, label: "kotlin" },
     ];
 
