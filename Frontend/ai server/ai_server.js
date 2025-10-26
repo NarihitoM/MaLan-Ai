@@ -3,10 +3,14 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import ModelClient, { isUnexpected } from "@azure-rest/ai-inference";
 import { AzureKeyCredential } from "@azure/core-auth";
+import multer from "multer";
+
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json()); // for JSON
+app.use(express.urlencoded({ extended: true })); // for form data
+const upload = multer({ storage: multer.memoryStorage() });
 
 const token = "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";
 
@@ -15,22 +19,28 @@ const client = ModelClient(
   new AzureKeyCredential(token)
 );
 
-app.post("/api/chat", async (req, res) => {
-  const userMessage = req.body.message || "";
+app.post("/api/chat", upload.single("file"), async (req, res) => {
+  const userMessage = req.body?.message || "";
+  const file = req.file;
   const timestamp = new Date().toISOString();
   console.log('\n=== Chat Request ===');
   console.log(`Time: ${timestamp}`);
   console.log('User:', userMessage);
+  if (file) {
+    console.log(`Received file: ${file.originalname} (${file.mimetype}, ${file.size} bytes)`);
+  }
 
   try {
+    let aiPrompt = userMessage;
+    if (file) {
+      aiPrompt += `\n\nFile uploaded: ${file.originalname} (type: ${file.mimetype})`;
+      // You could read the file buffer if needed:
+      // const fileContent = file.buffer.toString('utf8');
+    }
     const response = await client.path("/chat/completions").post({
       body: {
-        messages: [
-          { role: "system", content: "" },
-          { role: "user", content: userMessage }
-        ],
-        model: "meta/Llama-3.3-70B-Instruct",
-        temperature: 0.8,
+        messages: [{ role: "user", content: aiPrompt }],
+        model: "mistral-ai/mistral-small-2503",
         max_tokens: 512,
         top_p: 0.1
       }
