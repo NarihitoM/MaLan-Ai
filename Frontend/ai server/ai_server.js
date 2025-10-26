@@ -71,8 +71,6 @@ app.post("/api/chat", async (req, res) => {
         aiReply = "\n" + aiReply + "\n";
       }
     }
-
-
     aiReply = aiReply
       .split("\n")
       .map((line) =>
