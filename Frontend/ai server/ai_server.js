@@ -43,10 +43,13 @@ app.post("/api/chat", upload.single("file"), async (req, res) => {
         messages: [{ role: "user", content: aiPrompt }],
         model: "mistral-ai/mistral-small-2503",
         max_tokens: 512,
-      },
+        top_p: 0.1
+      }
     });
 
-    if (isUnexpected(response)) throw response.body.error;
+    if (isUnexpected(response)) {
+      throw response.body.error;
+    }
 
     let aiReply = response.body.choices[0].message.content || "";
 
@@ -64,8 +67,8 @@ app.post("/api/chat", upload.single("file"), async (req, res) => {
       { regex: /(console\.write|System\.Console|using )/, label: "fsharp" },
       { regex: /(package |import |func )/, label: "kotlin" },
     ];
-
-    if (!/```[\s\S]*?```/.test(aiReply)) {
+    const isCodeLike = /[{}();=]|^\s{4,}/m.test(aiReply);
+    if (!/```[\s\S]*?```/.test(aiReply) && isCodeLike) {
       let detected = false;
       for (let lang of languageMap) {
         if (lang.regex.test(aiReply)) {
@@ -78,8 +81,6 @@ app.post("/api/chat", upload.single("file"), async (req, res) => {
         aiReply = "\n" + aiReply + "\n";
       }
     }
-
-
     aiReply = aiReply
       .split("\n")
       .map((line) =>
