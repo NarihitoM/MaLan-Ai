@@ -1,15 +1,14 @@
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
 import ModelClient, { isUnexpected } from "@azure-rest/ai-inference";
 import { AzureKeyCredential } from "@azure/core-auth";
 import multer from "multer";
 
-
 const app = express();
 app.use(cors());
-app.use(express.json()); // for JSON
-app.use(express.urlencoded({ extended: true })); // for form data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const upload = multer({ storage: multer.memoryStorage() });
 
 const token = "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";
@@ -19,24 +18,30 @@ const client = ModelClient(
   new AzureKeyCredential(token)
 );
 
-app.post("/api/chat", upload.single("file"), async (req, res) => {
+app.post("/api/chat", upload.array("file"), async (req, res) => {
   const userMessage = req.body?.message || "";
-  const file = req.file;
+  const files = req.files;
   const timestamp = new Date().toISOString();
+
   console.log('\n=== Chat Request ===');
   console.log(`Time: ${timestamp}`);
   console.log('User:', userMessage);
-  if (file) {
-    console.log(`Received file: ${file.originalname} (${file.mimetype}, ${file.size} bytes)`);
+
+  let aiPrompt = userMessage;
+
+  if (files && files.length > 0) {
+    files.forEach(file => {
+      console.log(`Received file: ${file.originalname} (${file.mimetype}, ${file.size} bytes)`);
+
+      // Read file content as string (text files only)
+      const fileContent = file.buffer.toString('utf8'); 
+      console.log('File content (first 200 chars):', fileContent.slice(0, 200));
+
+      aiPrompt += `\n\nFile uploaded: ${file.originalname} (type: ${file.mimetype})\nContent:\n${fileContent}`;
+    });
   }
 
   try {
-    let aiPrompt = userMessage;
-    if (file) {
-      aiPrompt += `\n\nFile uploaded: ${file.originalname} (type: ${file.mimetype})`;
-      // You could read the file buffer if needed:
-      // const fileContent = file.buffer.toString('utf8');
-    }
     const response = await client.path("/chat/completions").post({
       body: {
         messages: [{ role: "user", content: aiPrompt }],
@@ -45,25 +50,17 @@ app.post("/api/chat", upload.single("file"), async (req, res) => {
         top_p: 0.1
       }
     });
-    if (isUnexpected(response)) {
-      throw response.body.error;
-    }
+
+    if (isUnexpected(response)) throw response.body.error;
 
     let aiReply = response.body.choices[0].message.content || "";
 
+    // Optional: language detection
     const languageMap = [
       { regex: /(const|let|var|function|class|import|console\.log)/, label: "javascript" },
       { regex: /(<\!DOCTYPE html|<html|<head|<body)/, label: "html" },
       { regex: /(def |print\(|import |class )/, label: "python" },
-      { regex: /(public|static|void|System\.out|class|package)/, label: "java" },
       { regex: /(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE)/i, label: "sql" },
-      { regex: /(#[^\n]*|puts |def )/, label: "ruby" },
-      { regex: /(func |package |import )/, label: "go" },
-      { regex: /(<?php|echo |function )/, label: "php" },
-      { regex: /(using |namespace |class |static )/, label: "csharp" },
-      { regex: /(int |float |double |printf|scanf)/, label: "c" },
-      { regex: /(console\.write|System\.Console|using )/, label: "fsharp" },
-      { regex: /(package |import |func )/, label: "kotlin" },
     ];
     const isCodeLike = /[{}();=]|^\s{4,}/m.test(aiReply);
     if (!/```[\s\S]*?```/.test(aiReply) && isCodeLike) {
@@ -75,19 +72,17 @@ app.post("/api/chat", upload.single("file"), async (req, res) => {
           break;
         }
       }
-      if (!detected) {
-        aiReply = "\n" + aiReply + "\n";
-      }
+      if (!detected) aiReply = "\n" + aiReply + "\n";
     }
+
     aiReply = aiReply
       .split("\n")
-      .map((line) =>
-        line.length > 80 ? line.match(/.{1,80}(?:\s|$)/g).join("\n") : line
-      )
+      .map(line => line.length > 80 ? line.match(/.{1,80}(?:\s|$)/g).join("\n") : line)
       .join("\n");
+
     console.log('AI:', aiReply);
-    console.log('===================\n');
     res.json({ reply: aiReply });
+
   } catch (err) {
     console.error('\nError:', err);
     res.status(500).json({ error: "AI request failed" });
@@ -96,4 +91,3 @@ app.post("/api/chat", upload.single("file"), async (req, res) => {
 
 const PORT = 4200;
 app.listen(PORT, () => console.log(`AI server running on port ${PORT}`));
-
