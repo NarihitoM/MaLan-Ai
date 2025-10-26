@@ -138,7 +138,6 @@ function Chat() {
 
     setistyping(false);
     setIsLoading(false);
-
   };
 
 
