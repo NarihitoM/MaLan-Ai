@@ -18,7 +18,6 @@ const client = ModelClient(
 app.post("/api/chat", async (req, res) => {
   const userMessage = req.body.message || "";
   const timestamp = new Date().toISOString();
-
   console.log('\n=== Chat Request ===');
   console.log(`Time: ${timestamp}`);
   console.log('User:', userMessage);
@@ -36,7 +35,6 @@ app.post("/api/chat", async (req, res) => {
         top_p: 0.1
       }
     });
-
     if (isUnexpected(response)) {
       throw response.body.error;
     }
@@ -79,7 +77,6 @@ app.post("/api/chat", async (req, res) => {
       .join("\n");
     console.log('AI:', aiReply);
     console.log('===================\n');
-
     res.json({ reply: aiReply });
   } catch (err) {
     console.error('\nError:', err);

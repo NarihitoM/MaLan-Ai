@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 function Chat() {
   const [userInput, setUserInput] = useState("");
-  const [file, setFile] = useState(null)
+  const [file, setFile] = useState([]);
   const fileInputRef = useRef(null)
   const [messagetext, setmessagetext] = useState([
     { text: "Start Chatting MaLan-Ai" },
@@ -15,8 +15,6 @@ function Chat() {
   const [name, setName] = useState("");
   const fovmessage = useRef(null);
   const navigate = useNavigate();
-
-
   const cancelRequestRef = useRef(null);
   const typewritingRef = useRef(null);
   const stopTypingRef = useRef(false);
@@ -38,16 +36,12 @@ function Chat() {
 
   const send = async () => {
     if (userInput.trim() === "" && !file) return;
-
     stopTypingRef.current = false;
-
     setmessagetext((prev) => [...prev, { sender: "user", text: userInput }]);
     setIsLoading(true);
-
     const controller = new AbortController();
     cancelRequestRef.current = controller;
     const signal = controller.signal;
-
     const payload = { message: userInput };
     let fetchOptions = {
       method: "POST",
@@ -89,7 +83,6 @@ function Chat() {
           setistyping(false);
           return;
         }
-
         index++;
         setmessagetext((prev) => {
           const newMessages = [...prev];
@@ -123,7 +116,6 @@ function Chat() {
       }
     }
   };
-
   const stopgenerate = () => {
     stopTypingRef.current = true;
 
@@ -149,18 +141,16 @@ function Chat() {
     setistyping(false);
     setIsLoading(false);
   };
-
-
   useEffect(() => {
     fovmessage.current?.scrollIntoView({ behavior: "smooth" });
   }, [messagetext]);
-
   return (
     <>
       <div className="head">
         <div className="row">
           <h1 className="h1">MaLan-AI</h1>
         </div>
+
         <div className="loginpage">
           <div className="row">
             {isLoggedin ? (
@@ -187,7 +177,6 @@ function Chat() {
           </div>
         </div>
       </div>
-
       <div className="container">
         <div className="chat-window">
           <div className="messages">
@@ -201,7 +190,6 @@ function Chat() {
             ))}
             <div ref={fovmessage}></div>
           </div>
-
           <div className="row1">
             <h1 className="copyright">@Copyright 2025 MaLan-AI</h1>
             <div className="input-area">
@@ -222,21 +210,23 @@ function Chat() {
               <input
                 type="file"
                 ref={fileInputRef}
-                onChange={(e) => setFile(e.target.files[0])}
+                onChange={(e) => {
+                  if (e.target.files.length > 0) {
+                    setFile((prev) => [...prev, ...Array.from(e.target.files)]);
+                  }
+                }}
+                multiple
                 style={{ display: "none" }}
               />
-              <button
-                className="upload-btn"
-                onClick={() => fileInputRef.current?.click()}
-              >
+              <button className="upload-btn" onClick={() => fileInputRef.current?.click()}>
                 📎
               </button>
-              {file && (
-                <p className="filename">
+
+              {file && file.map((file, index) => (
+                <p key={index} className="filename">
                   📎 {file.name}
                 </p>
-              )}
-
+              ))}
 
               <button
                 className="button"
