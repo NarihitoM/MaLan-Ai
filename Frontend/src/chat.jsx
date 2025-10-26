@@ -103,7 +103,7 @@ function Chat() {
           <div className="row">
             {isLoggedin ?
               (<>
-                <h1 className="h1pf2">{localStorage.getItem("email")}</h1>
+                <h1 className="h1pf1">{localStorage.getItem("email")}</h1>
                 <h1 className="h1pf">{localStorage.getItem("googlename")}</h1>
                 <button className="gotologinpage" onClick={logout}>Logout</button>
               </>)
