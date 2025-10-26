@@ -4,7 +4,7 @@ import "./chat.css"
 import { useEffect, useRef, useState } from "react";
 function Chat() {
   const [userInput, setUserInput] = useState("");
-  const [messagetext, setmessagetext] = useState([{ text: "Hello How Can I Help You?" }]);
+  const [messagetext, setmessagetext] = useState([{ text: "Hello This Is Our Chatbot Program MaLan-AI. Feel Free To Ask Anything." }]);
   const fovmessage = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedin, setloggedin] = useState(false);
