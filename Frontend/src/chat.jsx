@@ -10,7 +10,7 @@ function Chat() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedin, setloggedin] = useState(false);
   const [istyping, setistyping] = useState(false);
-  const [photo, setPhoto] = useState("");
+ 
   const [name, setName] = useState("");
 
   const navigate = useNavigate();
@@ -19,17 +19,14 @@ function Chat() {
     const isuserinthesystem = localStorage.getItem("keepLoggedIn");
     if (isuserinthesystem) {
       setloggedin(true);
-      setPhoto(localStorage.getItem("googlepicture") || "");
+      
       setName(localStorage.getItem("googlename") || "");
     }
     else {
       setloggedin(false);
     }
-  }, [isLoggedin, name, photo]);
+  }, [isLoggedin, name]);
 
-  useEffect(() => {
-    setPhoto(localStorage.getItem("googlepicture"))
-  }, [photo]);
 
   const logout = () => {
     localStorage.clear();
@@ -108,11 +105,6 @@ function Chat() {
               (<>
                 <h1 className="h1pf2">{localStorage.getItem("email")}</h1>
                 <h1 className="h1pf">{localStorage.getItem("googlename")}</h1>
-                <img
-                  src={photo}
-                  alt="Profile"
-                  className="profile-pic"
-                />
                 <button className="gotologinpage" onClick={logout}>Logout</button>
               </>)
               :

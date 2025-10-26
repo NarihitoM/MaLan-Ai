@@ -154,10 +154,15 @@
     font-family: 'Montserrat',serif;
     font-size: 20px;
     align-self: center;
+    margin-right: 10px;
+    color: rgb(0, 140, 255);
 }
-.h1pf2
+.h1pf1
 {
     font-family: 'Montserrat',serif;
     font-size: 15px;
     align-self: center;
+    margin-right: 10px;
+        color: rgb(0, 140, 255);
+
 }
