@@ -36,10 +36,26 @@ app.post("/api/chat", async (req, res) => {
 
     let aiReply = response.body.choices[0].message.content || "";
     aiReply = aiReply.replace(/<\/?think>/g, "").trim();
+    aiReply = aiReply.replace(/\n\s*\n/g, "\n");
+    aiReply = aiReply.replace(/([.*]|\d+\.)\s/g, "$1\n");
+    const codeRegex = /```[\s\S]*?```|(?:const|let|var|function|class|import|console\.log)/;
+    if (codeRegex.test(aiReply)) {
+      if (!aiReply.startsWith("```")) {
+        aiReply = '```javascript\n' + aiReply + '\n```';
+      }
+    }
+    aiReply = aiReply.split('\n').map(line => {
+      if (line.length > 80) {
+        const regex = /.{1,80}(?:\s|$)/g;
+        return line.match(regex).join('\n');
+      }
+      return line;
+    }).join('\n');
+    aiReply = aiReply.replace(/(### .+)/g, "\n$1\n");
 
     console.log('AI:', aiReply);
     console.log('===================\n');
-    
+
     res.json({ reply: aiReply });
   } catch (err) {
     console.error('\nError:', err);

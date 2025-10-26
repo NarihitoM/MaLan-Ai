@@ -49,7 +49,7 @@ app.post("/signup", (req, res) => {
                 res.status(500).send("Error saving user.");
             } else {
                 res.status(200).json({
-                    message: "Registered successfully",
+                    message: "Account Successfully Created",
                     email,
                     password
                 });
