@@ -35,24 +35,44 @@ app.post("/api/chat", async (req, res) => {
     if (isUnexpected(response)) throw response.body.error;
 
     let aiReply = response.body.choices[0].message.content || "";
-    aiReply = aiReply.replace(/<\/?think>/g, "").trim();
-    aiReply = aiReply.replace(/\n\s*\n/g, "\n");
-    aiReply = aiReply.replace(/([.*]|\d+\.)\s/g, "$1\n");
-    const codeRegex = /```[\s\S]*?```|(?:const|let|var|function|class|import|console\.log)/;
-    if (codeRegex.test(aiReply)) {
-      if (!aiReply.startsWith("```")) {
-        aiReply = '```javascript\n' + aiReply + '\n```';
+
+    const languageMap = [
+      { regex: /(const|let|var|function|class|import|console\.log)/, label: "javascript" },
+      { regex: /(<\!DOCTYPE html|<html|<head|<body)/, label: "html" },
+      { regex: /(def |print\(|import |class )/, label: "python" },
+      { regex: /(public|static|void|System\.out|class|package)/, label: "java" },
+      { regex: /(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE)/i, label: "sql" },
+      { regex: /(#[^\n]*|puts |def )/, label: "ruby" },
+      { regex: /(func |package |import )/, label: "go" },
+      { regex: /(<?php|echo |function )/, label: "php" },
+      { regex: /(using |namespace |class |static )/, label: "csharp" },
+      { regex: /(int |float |double |printf|scanf)/, label: "c" },
+      { regex: /(console\.write|System\.Console|using )/, label: "fsharp" },
+      { regex: /(BEGIN|END|IF|THEN|ELSE)/i, label: "pascal" },
+      { regex: /(package |import |func )/, label: "kotlin" },
+    ];
+
+    if (!/```[\s\S]*?```/.test(aiReply)) {
+      let detected = false;
+      for (let lang of languageMap) {
+        if (lang.regex.test(aiReply)) {
+          aiReply = lang.label + "\n" + aiReply + "\n";
+          detected = true;
+          break;
+        }
+      }
+      if (!detected) {
+        aiReply = "\n" + aiReply + "\n";
       }
     }
-    aiReply = aiReply.split('\n').map(line => {
-      if (line.length > 80) {
-        const regex = /.{1,80}(?:\s|$)/g;
-        return line.match(regex).join('\n');
-      }
-      return line;
-    }).join('\n');
-    aiReply = aiReply.replace(/(### .+)/g, "\n$1\n");
 
+
+    aiReply = aiReply
+      .split("\n")
+      .map((line) =>
+        line.length > 80 ? line.match(/.{1,80}(?:\s|$)/g).join("\n") : line
+      )
+      .join("\n");
     console.log('AI:', aiReply);
     console.log('===================\n');
 

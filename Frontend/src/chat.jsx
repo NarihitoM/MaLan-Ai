@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import "./chat.css"
 import { useEffect, useRef, useState } from "react";
@@ -133,12 +132,7 @@ function Chat() {
                 key={index}
                 className={msg.sender === "user" ? "usermessage" : "chatmessage"}
               >
-                <p> {msg.text.split(/([.*])/).map((part, index) => {
-                  if (part === "." || part === "*") {
-                    return <span key={index}>{part}<br /></span>; 
-                  }
-                  return <span key={index}>{part}</span>;
-                })}</p>
+                <p style={{ whiteSpace: "pre-wrap" }}>{msg.text}</p>
               </div>
             ))}
             <div ref={fovmessage}></div>
