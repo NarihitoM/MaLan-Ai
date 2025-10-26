@@ -4,7 +4,7 @@ import "./chat.css"
 import { useEffect, useRef, useState } from "react";
 function Chat() {
   const [userInput, setUserInput] = useState("");
-  const [messagetext, setmessagetext] = useState([{ text: "Hello How Can I Help You?" }]);
+  const [messagetext, setmessagetext] = useState([{ text: "Hello This Is Our Chatbot Program MaLan-AI. Feel Free To Ask Anything." }]);
   const fovmessage = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedin, setloggedin] = useState(false);
@@ -22,50 +22,66 @@ function Chat() {
     else {
       setloggedin(false);
     }
-  }, [isLoggedin,name,photo]);
+  }, [isLoggedin, name, photo]);
 
-  useEffect(() =>
-  {
-     setPhoto(localStorage.getItem("googlepicture"))
-  },[photo]);
-  
+  useEffect(() => {
+    setPhoto(localStorage.getItem("googlepicture"))
+  }, [photo]);
+
   const logout = () => {
     localStorage.clear();
     navigate("/login");
   }
-  const send = async() => {
+  const send = async () => {
     if (userInput.trim() === "") return;
     setmessagetext((previoustext) => [
       ...previoustext,
       { sender: "user", text: userInput }
     ]);
     setIsLoading(true);
-    const payload = { message: userInput};
+    const payload = { message: userInput };
     try {
-      const resp = await fetch("http://localhost:4200/api/chat",{
+      const resp = await fetch("http://localhost:4200/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if(!resp.ok){
-        const errBody = await resp.json().catch(()=> ({}));
+      if (!resp.ok) {
+        const errBody = await resp.json().catch(() => ({}));
         throw new Error(errBody.error || `Server returned ${resp.status}`);
       }
       const data = await resp.json();
       const botReply = data.reply || "No response from server";
-      setmessagetext((previoustext)=>[
+
+      let index = 0;
+      const typingspeed = 30;
+      setmessagetext((previoustext) => [
         ...previoustext,
-        { sender: "Bot", text: botReply}
+        { sender: "Bot", text: "" }
       ]);
+
+      const typewriting = setInterval(() => {
+        index++;
+        setmessagetext((previoustext) => {
+          const newMessages = [...previoustext];
+          const botMessage = newMessages[newMessages.length - 1];
+          botMessage.text = botReply.slice(0, index);
+          return newMessages;
+        });
+
+        if (index >= botReply.length) {
+          clearInterval(typewriting);
+        }
+      }, typingspeed);
     }
-    catch(err){
+    catch (err) {
       console.error("chat error", err);
-      setmessagetext((previoustext)=>[
+      setmessagetext((previoustext) => [
         ...previoustext,
-        { sender: "Bot", text: "Error could not reach chat server."}
+        { sender: "Bot", text: "Error could not reach chat server." }
       ]);
     }
-    finally{
+    finally {
       setIsLoading(false);
       setUserInput("");
     }
@@ -118,8 +134,10 @@ function Chat() {
           </div>
           <div className="row1">
             <h1 className="copyright">@Copyright 2025 MaLan-Ai</h1>
-            <div className="input-area">
-              <input
+          <div className="input-area">
+          {isLoggedin ? 
+               (<>
+               <input
                 className="input"
                 type="text"
                 value={userInput}
@@ -128,9 +146,14 @@ function Chat() {
                 placeholder="Ask Anything..."
                 disabled={isLoading}
               />
-              <button className="button" onClick={send} disabled={userInput.trim() === "" || isLoading}>
+               <button className="button" onClick={send} disabled={userInput.trim() === "" || isLoading}>
                 {isLoading ? "Sending..." : "Send"}
-              </button>
+              </button> : 
+              </>) :
+              (<>
+               <h1 className="warning">Please Log In or SignUp to continue</h1>
+              </>)
+                }  
             </div>
           </div>
         </div>

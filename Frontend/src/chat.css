@@ -169,5 +169,13 @@
     align-items: center;
     font-family: 'Montserrat',serif;
     margin-right: 20px;
-    
+}
+.warning
+{
+    font-size: 15px;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Montserrat',serif;
+    margin-right: 20px;
+    text-align: center;
 }
