@@ -27,9 +27,7 @@
 }
 .input-area {
     position: relative;      
-    width: 50%;           
-    align-self: center;
-  
+    width: 50%;          
 }
 .input {
     width: 100%;            
@@ -44,7 +42,6 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 15px;
     font-weight: 500;
-  
 }
 .button {
     position: absolute;
@@ -125,17 +122,17 @@
 .row1
 {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
+    gap: 50px;
     flex-direction: row;
-    align-items: center;
-    margin-top: 10px;
+    
 }
 .gotologinpage
 {
     align-self: center;
     padding: 10px;
     margin-right: 10px;
-     background-color: #000000;
+    background-color: #000000;
     color: white;
     border: none;
     border-radius: 10px;
@@ -168,7 +165,7 @@
     justify-content: center;
     align-items: center;
     font-family: 'Montserrat',serif;
-    margin-right: 20px;
+    margin-left: 20px;
 }
 .warning
 {
@@ -178,4 +175,17 @@
     font-family: 'Montserrat',serif;
     margin-right: 20px;
     text-align: center;
+}
+.circle
+{
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    border-top: 3px solid black ;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

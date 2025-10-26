@@ -1,32 +1,32 @@
-
 import { useNavigate } from "react-router-dom";
 import "./chat.css"
 import { useEffect, useRef, useState } from "react";
+
+
 function Chat() {
   const [userInput, setUserInput] = useState("");
   const [messagetext, setmessagetext] = useState([{ text: "Hello This Is Our Chatbot Program MaLan-AI. Feel Free To Ask Anything." }]);
   const fovmessage = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedin, setloggedin] = useState(false);
-  const [photo, setPhoto] = useState("");
+  const [istyping, setistyping] = useState(false);
+ 
   const [name, setName] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const isuserinthesystem = localStorage.getItem("keepLoggedIn");
     if (isuserinthesystem) {
       setloggedin(true);
-      setPhoto(localStorage.getItem("googlepicture") || "");
+      
       setName(localStorage.getItem("googlename") || "");
     }
     else {
       setloggedin(false);
     }
-  }, [isLoggedin, name, photo]);
+  }, [isLoggedin, name]);
 
-  useEffect(() => {
-    setPhoto(localStorage.getItem("googlepicture"))
-  }, [photo]);
 
   const logout = () => {
     localStorage.clear();
@@ -52,7 +52,7 @@ function Chat() {
       }
       const data = await resp.json();
       const botReply = data.reply || "No response from server";
-
+      setistyping(true);
       let index = 0;
       const typingspeed = 30;
       setmessagetext((previoustext) => [
@@ -71,6 +71,7 @@ function Chat() {
 
         if (index >= botReply.length) {
           clearInterval(typewriting);
+          setistyping(false);
         }
       }, typingspeed);
     }
@@ -80,6 +81,7 @@ function Chat() {
         ...previoustext,
         { sender: "Bot", text: "Error could not reach chat server." }
       ]);
+      setistyping(false);
     }
     finally {
       setIsLoading(false);
@@ -101,13 +103,8 @@ function Chat() {
           <div className="row">
             {isLoggedin ?
               (<>
-                <h1 className="h1pf2">{localStorage.getItem("email")}</h1>
+                <h1 className="h1pf1">{localStorage.getItem("email")}</h1>
                 <h1 className="h1pf">{localStorage.getItem("googlename")}</h1>
-                <img
-                  src={photo}
-                  alt="Profile"
-                  className="profile-pic"
-                />
                 <button className="gotologinpage" onClick={logout}>Logout</button>
               </>)
               :
@@ -127,27 +124,36 @@ function Chat() {
                 key={index}
                 className={msg.sender === "user" ? "usermessage" : "chatmessage"}
               >
-                <p>{msg.text}</p>
+                <p style={{ whiteSpace: "pre-wrap" }}>{msg.text}</p>
               </div>
             ))}
             <div ref={fovmessage}></div>
           </div>
           <div className="row1">
             <h1 className="copyright">@Copyright 2025 MaLan-Ai</h1>
-          <div className="input-area">
-          <input
-                className="input"
-                type="text"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") send(); }}
-                placeholder="Ask Anything..."
-                disabled={isLoading}
-              />
-               <button className="button" onClick={send} disabled={userInput.trim() === "" || isLoading}>
-                {isLoading ? "Sending..." : "Send"}
-              </button>  
-            </div>
+            {isLoggedin ?
+              (<>
+                <div className="input-area">
+                  <input
+                    className="input"
+                    type="text"
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" && !istyping) send(); }}
+                    placeholder="Ask Anything..."
+                    disabled={isLoading && istyping}
+                  />
+                  <button className="button" onClick={() => { if (!istyping) send(); }} disabled={userInput.trim() === "" || isLoading}>
+                    {istyping ? <div className="circle"></div> : isLoading ? "Sending..." : "Send"}
+                  </button>
+                </div> :
+              </>) :
+              (<>
+                <div className="input-area">
+                  <h1 className="warning">Please Log In or SignUp to continue</h1>
+                </div>
+              </>)
+            }
           </div>
         </div>
       </div>

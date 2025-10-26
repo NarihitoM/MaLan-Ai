@@ -35,11 +35,46 @@ app.post("/api/chat", async (req, res) => {
     if (isUnexpected(response)) throw response.body.error;
 
     let aiReply = response.body.choices[0].message.content || "";
-    aiReply = aiReply.replace(/<\/?think>/g, "").trim();
 
+    const languageMap = [
+      { regex: /(const|let|var|function|class|import|console\.log)/, label: "javascript" },
+      { regex: /(<\!DOCTYPE html|<html|<head|<body)/, label: "html" },
+      { regex: /(def |print\(|import |class )/, label: "python" },
+      { regex: /(public|static|void|System\.out|class|package)/, label: "java" },
+      { regex: /(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE)/i, label: "sql" },
+      { regex: /(#[^\n]*|puts |def )/, label: "ruby" },
+      { regex: /(func |package |import )/, label: "go" },
+      { regex: /(<?php|echo |function )/, label: "php" },
+      { regex: /(using |namespace |class |static )/, label: "csharp" },
+      { regex: /(int |float |double |printf|scanf)/, label: "c" },
+      { regex: /(console\.write|System\.Console|using )/, label: "fsharp" },
+      { regex: /(package |import |func )/, label: "kotlin" },
+    ];
+
+    if (!/```[\s\S]*?```/.test(aiReply)) {
+      let detected = false;
+      for (let lang of languageMap) {
+        if (lang.regex.test(aiReply)) {
+          aiReply = lang.label + "\n" + aiReply + "\n";
+          detected = true;
+          break;
+        }
+      }
+      if (!detected) {
+        aiReply = "\n" + aiReply + "\n";
+      }
+    }
+
+
+    aiReply = aiReply
+      .split("\n")
+      .map((line) =>
+        line.length > 80 ? line.match(/.{1,80}(?:\s|$)/g).join("\n") : line
+      )
+      .join("\n");
     console.log('AI:', aiReply);
     console.log('===================\n');
-    
+
     res.json({ reply: aiReply });
   } catch (err) {
     console.error('\nError:', err);

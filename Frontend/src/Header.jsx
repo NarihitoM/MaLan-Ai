@@ -157,9 +157,9 @@ function Header() {
               <div className="floating-content">
                 <h2>Terms & Conditions</h2>
                 <ol type="I">
-                  <li>a</li>
-                  <li>b</li>
-                  <li>c</li>
+                  <li>Currently In Development</li>
+                  <li>Under Maintainance</li>
+                  <li>Develop By MaLan-Ai Team</li>
                 </ol>
                 <button className="buttonlogin3" onClick={() => setshowterms(false)} >Close</button>
               </div>
