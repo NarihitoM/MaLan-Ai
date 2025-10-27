@@ -32,7 +32,6 @@ app.post("/api/chat", upload.array("file"), async (req, res) => {
 
   let aiPrompt = userMessage;
 
-  // If client requests to include this server file in the AI prompt:
   const includeServerFile = req.body?.includeServerFile === 'true' || req.body?.includeServerFile === '1';
   if (includeServerFile) {
     try {

@@ -39,7 +39,6 @@ function Chat() {
     if (userInput.trim() === "" && file.length === 0) return;
     stopTypingRef.current = false;
     
-    // Add files info to message
     const messageFiles = file.map(f => ({ name: f.name }));
     setmessagetext((prev) => [...prev, { 
       sender: "user", 
@@ -59,7 +58,7 @@ function Chat() {
     if (file.length > 0) {
       const form = new FormData();
       form.append("message", userInput);
-      // append each selected file (backend expects an array named "file")
+      
       file.forEach((f) => form.append("file", f));
       if (includeServerFile) form.append("includeServerFile", "true");
       fetchOptions.body = form;
