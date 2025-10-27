@@ -66,7 +66,8 @@ app.post("/google-signup", (req, res) => {
          ON DUPLICATE KEY UPDATE name = VALUES(name), picture = VALUES(picture)`,
         [email, name, picture, googleId],
         (err, result) => {
-            if (err) {
+            if (err)
+            {
                 console.error(err);
                 return res.status(500).json({ message: "Error saving Google user" });
             }

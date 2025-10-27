@@ -102,7 +102,7 @@ app.post("/api/chat", upload.array("file"), async (req, res) => {
 
     console.log('AI:', aiReply);
     if (createfile && aiReply) {
-      const fileName = `Response-${Date.now()}.txt`;
+      const fileName = `Response.txt`;
       fs.writeFileSync(fileName, aiReply, "utf8");
       console.log(`File created: ${fileName}`);
 
