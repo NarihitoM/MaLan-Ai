@@ -3,15 +3,16 @@ const mysql = require('mysql');
 const cors = require('cors');
 const jwt = require("jsonwebtoken");
 const app = express();
+require('dotenv').config();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "malan-ai"
+    host: process.env.HOST,
+    user: process.env.USER,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE,
 });
 app.post("/login", (req, res) => {
   const { email, password } = req.body;

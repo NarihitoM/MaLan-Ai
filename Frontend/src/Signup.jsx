@@ -46,6 +46,11 @@ function Signup() {
 
   const googlelogin = useGoogleLogin({
   onSuccess: async (response) => {
+    if (!context) {
+      settext("Please check terms and conditions");
+      setbool(true);
+      return;
+    }
     try {
       const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
         headers: { Authorization: `Bearer ${response.access_token}` },
@@ -100,15 +105,16 @@ function Signup() {
     <div className="Body">
       <form className="Form2" onSubmit={handlevalidation}>
         <h1 className="h1">MaLan-Ai</h1>
-        <label className="label">Create Email</label>
+        <h2 className="h1">Sign Up</h2>
+
         <input type="text" className="input" value={email} style={email === "" ?{border: "2px solid gray"} : { border: "2px solid " + (emailRegex.test(email) ? "green" : "red") }} onChange={(e) => setemail(e.target.value)} placeholder="Enter Email"/>
-        <label className="label">Create Password</label>
+      
         <input type="password"className="input"value={password} style={{ border: password === "" ? "2px solid gray" : password === confirmpassword ? "2px solid green" : "2px solid red" }} onChange={(e) => setpassword(e.target.value)}placeholder="Enter Password"/>
-        <label className="label">Confirm Password</label>
+        
         <input type="password" className="input"value={confirmpassword} style={{ border: confirmpassword === "" ? "2px solid gray" : password === confirmpassword ? "2px solid green" : "2px solid red"}} onChange={(e) => setconfirmpassword(e.target.value)} placeholder="Enter Confirm Password"
         />
         {bool && (<p className="p" style={{ color: text === "Account Successfully Created" || text === "Google Login Successful" ? "green" : "red" }} >{text}</p>)}
-        <div className="row3"><input type="checkbox" value={context} onChange={(e) => setcontext(e.target.checked)} /><h3>I agree to <span class="terms" onClick={() => setshowterms(true)} >Terms and conditions</span></h3>
+        <div className="row4"><input type="checkbox" value={context} onChange={(e) => setcontext(e.target.checked)} /><h3>I agree to <span class="terms" onClick={() => setshowterms(true)} >Terms and conditions</span></h3>
           </div>
         <button className="buttonlogin" type="submit">Create Account with MaLan-Ai</button>
         <button className="buttonlogin1" type="button" onClick={googlelogin}>

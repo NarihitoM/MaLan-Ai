@@ -5,6 +5,8 @@ import { AzureKeyCredential } from "@azure/core-auth";
 import multer from "multer";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import dotenv from 'dotenv';
+dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 
 const app = express();
@@ -14,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-const token = "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";
+const token = process.env.API_KEY;
 
 const client = ModelClient(
   "https://models.github.ai/inference",

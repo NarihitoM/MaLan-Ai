@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 function Chat() {
   const [userInput, setUserInput] = useState("");
-  const [file, setFile] = useState([]); // unchanged initial state but it's an array
+  const [file, setFile] = useState([]); 
   const [includeServerFile, setIncludeServerFile] = useState(false);
   const fileInputRef = useRef(null)
   const [messagetext, setmessagetext] = useState([
@@ -72,7 +72,7 @@ function Chat() {
 
     try {
       const resp = await fetch("http://localhost:4200/api/chat", fetchOptions);
-      // clear selected files on success
+    
       if (resp.ok) setFile([]);
 
       if (!resp.ok) {
@@ -159,6 +159,11 @@ function Chat() {
   useEffect(() => {
     fovmessage.current?.scrollIntoView({ behavior: "smooth" });
   }, [messagetext]);
+
+  const deletefile = (index) =>
+  {
+    setFile(prev => prev.filter((_,i) => i !== index));
+  }
   return (
     <>
       <div className="head">
@@ -200,7 +205,7 @@ function Chat() {
                 key={index}
                 className={msg.sender === "user" ? "usermessage" : "chatmessage"}
               >
-                <p style={{ whiteSpace: "pre-wrap" }}>
+                <p style={{ whiteSpace: "pre-wrap"  }}>
                   {msg.text}
                   {msg.files && msg.files.map((file, index) => (
                     <span key={index} className="filename">
@@ -217,7 +222,7 @@ function Chat() {
             <div className="input-area">
               <div className="input-row">
                 <input
-                  className="input"
+                  className="input1"
                   type="text"
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
@@ -264,9 +269,12 @@ function Chat() {
               {file.length > 0 && (
                 <div className="files-container">
                   {file.map((file, index) => (
+                    <>
                     <p key={index} className="filename">
                       📎 {file.name}
                     </p>
+                    <button className="deletebutton" onClick={() => deletefile(index)}>x</button>
+                    </>
                   ))}
                 </div>
               )}
