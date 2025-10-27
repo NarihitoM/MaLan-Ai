@@ -33,13 +33,14 @@
 
 .h1 {
   text-align: center;
- 
+
 }
 
 .input {
   padding: 10px;
   border-radius: 10px;
   box-sizing: border-box;
+  margin-top: 10px;
 }
 
 .input:focus {
@@ -48,7 +49,6 @@
 
 .label,
 .p {
-
   font-weight: 500;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -138,31 +138,38 @@
   align-self: center;
 }
 
-.terms{
+.terms {
   cursor: pointer;
   text-decoration: underline;
 }
-.profile-pic
-{
-   border-radius: 50%;
-   width: 30px;
-   height: 30px;
-   align-self: center;
-}
-.h1pf
-{
-    font-family: 'Montserrat',serif;
-    font-size: 20px;
-    align-self: center;
-    margin-right: 10px;
-    color: rgb(0, 140, 255);
-}
-.h1pf1
-{
-    font-family: 'Montserrat',serif;
-    font-size: 15px;
-    align-self: center;
-    margin-right: 10px;
-        color: rgb(0, 140, 255);
 
+.profile-pic {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  align-self: center;
+}
+
+.h1pf {
+  font-family: 'Montserrat', serif;
+  font-size: 20px;
+  align-self: center;
+  margin-right: 10px;
+  color: rgb(0, 140, 255);
+}
+
+.h1pf1 {
+  font-family: 'Montserrat', serif;
+  font-size: 15px;
+  align-self: center;
+  margin-right: 10px;
+  color: rgb(0, 140, 255);
+
+}
+
+.row4 {
+  align-self: center;
+  font-weight: 400;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
 }

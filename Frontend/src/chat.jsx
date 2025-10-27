@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 function Chat() {
   const [userInput, setUserInput] = useState("");
-  const [file, setFile] = useState([]); // unchanged initial state but it's an array
+  const [file, setFile] = useState([]); 
   const [includeServerFile, setIncludeServerFile] = useState(false);
   const fileInputRef = useRef(null)
   const [messagetext, setmessagetext] = useState([
@@ -72,7 +72,7 @@ function Chat() {
 
     try {
       const resp = await fetch("http://localhost:4200/api/chat", fetchOptions);
-      // clear selected files on success
+    
       if (resp.ok) setFile([]);
 
       if (!resp.ok) {
@@ -200,7 +200,7 @@ function Chat() {
                 key={index}
                 className={msg.sender === "user" ? "usermessage" : "chatmessage"}
               >
-                <p style={{ whiteSpace: "pre-wrap" }}>
+                <p style={{ whiteSpace: "pre-wrap"  }}>
                   {msg.text}
                   {msg.files && msg.files.map((file, index) => (
                     <span key={index} className="filename">

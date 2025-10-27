@@ -134,14 +134,14 @@ function Header() {
       <div className="Body">
         <form onSubmit={Handlevalidation} className="Form">
           <h1 className="h1">MaLan-Ai</h1>
-          <label className="label">Enter Email</label>
-          <input className="input" type="text" style={{ border: user === "" ? "2px solid gray" : emailRegex.test(user) ? "2px solid green" : "2px solid red" }} value={user} placeholder="Enter Email" onChange={(e) => setuser(e.target.value)} />
-          <label className="label">Enter Password</label>
+         
+          <input className="input" type="text" style={{ border: user === "" ? "2px solid gray" : emailRegex.test(user) ? "2px solid green" : "2px solid red" }} value={user} placeholder="Create Email" onChange={(e) => setuser(e.target.value)} />
+       
           <input className="input" type="password" style={{ border: password === "" ? "2px solid gray" : password.length >= 6 ? "2px solid green" : "2px solid red" }} value={password} placeholder="Enter password" onChange={(e) => setpassword(e.target.value)} />
           {bool && (
             <p className="p" style={{ color: text === "Login Successful" || text === "Google Login Successful" ? "green" : "red" }}>{text}</p>
           )}
-          <div className="row3"><input type="checkbox" value={context} onChange={(e) => setcontext(e.target.checked)} /><h3>I agree to <span class="terms" onClick={() => setshowterms(true)} >Terms and conditions</span></h3>
+          <div className="row4"><input type="checkbox" value={context} onChange={(e) => setcontext(e.target.checked)} /><h3>I agree to <span class="terms" onClick={() => setshowterms(true)} >Terms and conditions</span></h3>
           </div>
           <button className="buttonlogin" type="submit">Log In</button>
           <button className="buttonlogin1" type="button" onClick={googlelogin}>
