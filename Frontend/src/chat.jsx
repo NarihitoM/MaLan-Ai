@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 function Chat() {
   const [userInput, setUserInput] = useState("");
-  const [file, setFile] = useState([]);
+  const [file, setFile] = useState([]); // unchanged initial state but it's an array
+  const [includeServerFile, setIncludeServerFile] = useState(false);
   const fileInputRef = useRef(null)
   const [messagetext, setmessagetext] = useState([
     { text: "Start Chatting MaLan-Ai" },
@@ -35,9 +36,17 @@ function Chat() {
   };
 
   const send = async () => {
-    if (userInput.trim() === "" && !file) return;
+    if (userInput.trim() === "" && file.length === 0) return;
     stopTypingRef.current = false;
-    setmessagetext((prev) => [...prev, { sender: "user", text: userInput }]);
+    
+    // Add files info to message
+    const messageFiles = file.map(f => ({ name: f.name }));
+    setmessagetext((prev) => [...prev, { 
+      sender: "user", 
+      text: userInput,
+      files: messageFiles
+    }]);
+    
     setIsLoading(true);
     const controller = new AbortController();
     cancelRequestRef.current = controller;
@@ -47,18 +56,25 @@ function Chat() {
       method: "POST",
       signal,
     };
-    if (file) {
+    if (file.length > 0) {
       const form = new FormData();
       form.append("message", userInput);
-      form.append("file", file);
+      // append each selected file (backend expects an array named "file")
+      file.forEach((f) => form.append("file", f));
+      if (includeServerFile) form.append("includeServerFile", "true");
       fetchOptions.body = form;
+    } else {
+      fetchOptions.headers = { "Content-Type": "application/json" };
+      fetchOptions.body = JSON.stringify({
+        message: userInput,
+        includeServerFile: includeServerFile ? "true" : "false",
+      });
     }
-    else {
-      fetchOptions.headers = { "Content-Type": "application/json" }
-      fetchOptions.body = JSON.stringify({ message: userInput });
-    }
+
     try {
       const resp = await fetch("http://localhost:4200/api/chat", fetchOptions);
+      // clear selected files on success
+      if (resp.ok) setFile([]);
 
       if (!resp.ok) {
         const errBody = await resp.json().catch(() => ({}));
@@ -185,7 +201,14 @@ function Chat() {
                 key={index}
                 className={msg.sender === "user" ? "usermessage" : "chatmessage"}
               >
-                <p style={{ whiteSpace: "pre-wrap" }}>{msg.text}</p>
+                <p style={{ whiteSpace: "pre-wrap" }}>
+                  {msg.text}
+                  {msg.files && msg.files.map((file, index) => (
+                    <span key={index} className="filename">
+                      📎 {file.name}
+                    </span>
+                  ))}
+                </p>
               </div>
             ))}
             <div ref={fovmessage}></div>
@@ -193,57 +216,61 @@ function Chat() {
           <div className="row1">
             <h1 className="copyright">@Copyright 2025 MaLan-AI</h1>
             <div className="input-area">
-              <input
-                className="input"
-                type="text"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && userInput.trim() !== "" && !isLoading) {
+              <div className="input-row">
+                <input
+                  className="input"
+                  type="text"
+                  value={userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && userInput.trim() !== "" && !isLoading) {
+                      if (istyping) stopgenerate();
+                      else send();
+                    }
+                  }}
+                  placeholder="Ask Anything..."
+                />
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    if (e.target.files.length > 0) {
+                      setFile((prev) => [...prev, ...Array.from(e.target.files)]);
+                    }
+                  }}
+                  multiple
+                  style={{ display: "none" }}
+                />
+                <button className="upload-btn" onClick={() => fileInputRef.current?.click()}>
+                  📎
+                </button>
+                <button
+                  className="button"
+                  onClick={() => {
                     if (istyping) stopgenerate();
-                    else
-                      send();
-                  }
-                }}
-                placeholder="Ask Anything..."
-              />
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={(e) => {
-                  if (e.target.files.length > 0) {
-                    setFile((prev) => [...prev, ...Array.from(e.target.files)]);
-                  }
-                }}
-                multiple
-                style={{ display: "none" }}
-              />
-              <button className="upload-btn" onClick={() => fileInputRef.current?.click()}>
-                📎
-              </button>
-
-              {file && file.map((file, index) => (
-                <p key={index} className="filename">
-                  📎 {file.name}
-                </p>
-              ))}
-
-              <button
-                className="button"
-                onClick={() => {
-                  if (istyping) stopgenerate();
-                  else send();
-                }}
-                disabled={userInput.trim() === "" && !file || isLoading}
-              >
-                {istyping ? (
-                  <div className="circle"></div>
-                ) : isLoading ? (
-                  "Sending..."
-                ) : (
-                  "Send"
-                )}
-              </button>
+                    else send();
+                  }}
+                  disabled={(userInput.trim() === "" && file.length === 0) || isLoading}
+                >
+                  {istyping ? (
+                    <div className="circle"></div>
+                  ) : isLoading ? (
+                    "Send"
+                  ) : (
+                    "Send"
+                  )}
+                </button>
+              </div>
+              
+              {file.length > 0 && (
+                <div className="files-container">
+                  {file.map((file, index) => (
+                    <p key={index} className="filename">
+                      📎 {file.name}
+                    </p>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

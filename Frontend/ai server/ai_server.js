@@ -3,6 +3,9 @@ import cors from "cors";
 import ModelClient, { isUnexpected } from "@azure-rest/ai-inference";
 import { AzureKeyCredential } from "@azure/core-auth";
 import multer from "multer";
+import fs from "fs";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 const app = express();
 app.use(cors());
@@ -29,18 +32,29 @@ app.post("/api/chat", upload.array("file"), async (req, res) => {
 
   let aiPrompt = userMessage;
 
+  // If client requests to include this server file in the AI prompt:
+  const includeServerFile = req.body?.includeServerFile === 'true' || req.body?.includeServerFile === '1';
+  if (includeServerFile) {
+    try {
+      const serverFileContent = fs.readFileSync(__filename, 'utf8');
+      console.log(`Including server file: ${__filename}`);
+      console.log('Server file content (first 200 chars):', serverFileContent.slice(0, 200));
+      aiPrompt += `\n\n[Server file: ${__filename}]\n${serverFileContent}`;
+    } catch (readErr) {
+      console.error('Failed to read server file:', readErr);
+    }
+  }
+
   if (files && files.length > 0) {
     files.forEach(file => {
       console.log(`Received file: ${file.originalname} (${file.mimetype}, ${file.size} bytes)`);
 
-      // Read file content as string (text files only)
-      const fileContent = file.buffer.toString('utf8'); 
+      const fileContent = file.buffer.toString('utf8');
       console.log('File content (first 200 chars):', fileContent.slice(0, 200));
 
       aiPrompt += `\n\nFile uploaded: ${file.originalname} (type: ${file.mimetype})\nContent:\n${fileContent}`;
     });
   }
-
   try {
     const response = await client.path("/chat/completions").post({
       body: {
