@@ -46,6 +46,11 @@ function Signup() {
 
   const googlelogin = useGoogleLogin({
   onSuccess: async (response) => {
+    if (!context) {
+      settext("Please check terms and conditions");
+      setbool(true);
+      return;
+    }
     try {
       const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
         headers: { Authorization: `Bearer ${response.access_token}` },
@@ -100,7 +105,8 @@ function Signup() {
     <div className="Body">
       <form className="Form2" onSubmit={handlevalidation}>
         <h1 className="h1">MaLan-Ai</h1>
-    
+        <h2 className="h1">Sign Up</h2>
+
         <input type="text" className="input" value={email} style={email === "" ?{border: "2px solid gray"} : { border: "2px solid " + (emailRegex.test(email) ? "green" : "red") }} onChange={(e) => setemail(e.target.value)} placeholder="Enter Email"/>
       
         <input type="password"className="input"value={password} style={{ border: password === "" ? "2px solid gray" : password === confirmpassword ? "2px solid green" : "2px solid red" }} onChange={(e) => setpassword(e.target.value)}placeholder="Enter Password"/>

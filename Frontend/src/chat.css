@@ -99,6 +99,9 @@
     display: flex;
     align-items: center;
     gap: 4px;
+     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
 }
 .filename1
 {
