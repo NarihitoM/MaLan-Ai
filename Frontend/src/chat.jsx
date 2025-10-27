@@ -159,6 +159,11 @@ function Chat() {
   useEffect(() => {
     fovmessage.current?.scrollIntoView({ behavior: "smooth" });
   }, [messagetext]);
+
+  const deletefile = (index) =>
+  {
+    setFile(prev => prev.filter((_,i) => i !== index));
+  }
   return (
     <>
       <div className="head">
@@ -217,7 +222,7 @@ function Chat() {
             <div className="input-area">
               <div className="input-row">
                 <input
-                  className="input"
+                  className="input1"
                   type="text"
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
@@ -264,9 +269,12 @@ function Chat() {
               {file.length > 0 && (
                 <div className="files-container">
                   {file.map((file, index) => (
+                    <>
                     <p key={index} className="filename">
                       📎 {file.name}
                     </p>
+                    <button className="deletebutton" onClick={() => deletefile(index)}>x</button>
+                    </>
                   ))}
                 </div>
               )}
