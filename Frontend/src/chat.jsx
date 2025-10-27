@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 function Chat() {
   const [userInput, setUserInput] = useState("");
-  const [file, setFile] = useState([]); 
+  const [file, setFile] = useState([]);
   const [includeServerFile, setIncludeServerFile] = useState(false);
   const fileInputRef = useRef(null)
   const [messagetext, setmessagetext] = useState([
@@ -19,7 +19,7 @@ function Chat() {
   const cancelRequestRef = useRef(null);
   const typewritingRef = useRef(null);
   const stopTypingRef = useRef(false);
-
+  const [createfile, setcreatefile] = useState(false);
   useEffect(() => {
     const isuserinthesystem = localStorage.getItem("keepLoggedIn");
     if (isuserinthesystem) {
@@ -38,14 +38,14 @@ function Chat() {
   const send = async () => {
     if (userInput.trim() === "" && file.length === 0) return;
     stopTypingRef.current = false;
-    
+
     const messageFiles = file.map(f => ({ name: f.name }));
-    setmessagetext((prev) => [...prev, { 
-      sender: "user", 
+    setmessagetext((prev) => [...prev, {
+      sender: "user",
       text: userInput,
       files: messageFiles
     }]);
-    
+
     setIsLoading(true);
     const controller = new AbortController();
     cancelRequestRef.current = controller;
@@ -58,21 +58,24 @@ function Chat() {
     if (file.length > 0) {
       const form = new FormData();
       form.append("message", userInput);
-      
+
       file.forEach((f) => form.append("file", f));
       if (includeServerFile) form.append("includeServerFile", "true");
+      if (createfile) form.append("createfile", "true");
+
       fetchOptions.body = form;
     } else {
       fetchOptions.headers = { "Content-Type": "application/json" };
       fetchOptions.body = JSON.stringify({
         message: userInput,
         includeServerFile: includeServerFile ? "true" : "false",
+        createfile: createfile ? "true" : "false",
       });
     }
-
+    //Ai Response Industry//
     try {
       const resp = await fetch("http://localhost:4200/api/chat", fetchOptions);
-    
+
       if (resp.ok) setFile([]);
 
       if (!resp.ok) {
@@ -85,6 +88,20 @@ function Chat() {
 
       if (stopTypingRef.current) return;
 
+      if (data.file?.url) {
+        setmessagetext((prev) => [
+          ...prev,
+          {
+            sender: "Bot",
+            text: "Here is the file created",
+            fileDownload: {
+              name: data.file.name,
+              url: data.file.url
+            }
+          },
+        ]);
+        return;
+      }
       setistyping(true);
       let index = 0;
       const typingspeed = 30;
@@ -160,9 +177,8 @@ function Chat() {
     fovmessage.current?.scrollIntoView({ behavior: "smooth" });
   }, [messagetext]);
 
-  const deletefile = (index) =>
-  {
-    setFile(prev => prev.filter((_,i) => i !== index));
+  const deletefile = (index) => {
+    setFile(prev => prev.filter((_, i) => i !== index));
   }
   return (
     <>
@@ -205,13 +221,20 @@ function Chat() {
                 key={index}
                 className={msg.sender === "user" ? "usermessage" : "chatmessage"}
               >
-                <p style={{ whiteSpace: "pre-wrap"  }}>
+                <p style={{ whiteSpace: "pre-wrap" }}>
                   {msg.text}
                   {msg.files && msg.files.map((file, index) => (
                     <span key={index} className="filename">
                       📎 {file.name}
                     </span>
                   ))}
+                  {msg.fileDownload && (
+                    <div className="download-link">
+                      📁 <a href={msg.fileDownload.url} download={msg.fileDownload.name} target="_blank" rel="noopener noreferrer">
+                        Download {msg.fileDownload.name}
+                      </a>
+                    </div>
+                  )}
                 </p>
               </div>
             ))}
@@ -220,6 +243,14 @@ function Chat() {
           <div className="row1">
             <h1 className="copyright">@Copyright 2025 MaLan-AI</h1>
             <div className="input-area">
+              <label className="checkbox">
+                <input
+                  type="checkbox"
+                  checked={createfile}
+                  onChange={(e) => setcreatefile(e.target.checked)}
+                />
+                Create file
+              </label>
               <div className="input-row">
                 <input
                   className="input1"
@@ -264,16 +295,17 @@ function Chat() {
                     "Send"
                   )}
                 </button>
+
               </div>
-              
+
               {file.length > 0 && (
                 <div className="files-container">
                   {file.map((file, index) => (
                     <>
-                    <p key={index} className="filename">
-                      📎 {file.name}
-                    </p>
-                    <button className="deletebutton" onClick={() => deletefile(index)}>x</button>
+                      <p key={index} className="filename">
+                        <i class="fa-solid fa-file"></i> {file.name}
+                      </p>
+                      <button className="deletebutton" onClick={() => deletefile(index)}>x</button>
                     </>
                   ))}
                 </div>

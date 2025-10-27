@@ -1,0 +1,23 @@
+Sure, I can help you clean up and improve the content of your `README.md` file. 
+Here's a revised version:
+
+```markdown
+# Ai Development
+
+This is the development repository for our MaLan-Ai Project.
+
+## Made By
+- Narihito
+- Riae
+```
+
+### Explanation of Changes:
+1. **Removed unnecessary line breaks**: The `README.md` file should be clean and 
+easy to read.
+2. **Added a section header**: "Made By" is now a section header for better 
+organization.
+3. **Formatted names**: Listed the names under the "Made By" section for 
+clarity.
+
+If you need any additional information or sections (like installation 
+instructions, usage examples, etc.), feel free to let me know!

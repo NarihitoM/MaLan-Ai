@@ -1,0 +1,13 @@
+Sure! Here is a simple HTML code with just four lines:
+
+```html
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Hello, World!</h1>
+    </body>
+</html>
+```
+
+This code creates a basic HTML document that displays the text "Hello, World!" 
+in a heading.

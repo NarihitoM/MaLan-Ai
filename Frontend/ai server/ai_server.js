@@ -56,6 +56,11 @@ app.post("/api/chat", upload.array("file"), async (req, res) => {
       aiPrompt += `\n\nFile uploaded: ${file.originalname} (type: ${file.mimetype})\nContent:\n${fileContent}`;
     });
   }
+
+  const createfile = req.body?.createfile === 'true' || req.body?.createfile === '1';
+
+
+    // Ai Reply Industry //
   try {
     const response = await client.path("/chat/completions").post({
       body: {
@@ -70,7 +75,7 @@ app.post("/api/chat", upload.array("file"), async (req, res) => {
 
     let aiReply = response.body.choices[0].message.content || "";
 
-    // Optional: language detection
+
     const languageMap = [
       { regex: /(const|let|var|function|class|import|console\.log)/, label: "javascript" },
       { regex: /(<\!DOCTYPE html|<html|<head|<body)/, label: "html" },
@@ -96,6 +101,21 @@ app.post("/api/chat", upload.array("file"), async (req, res) => {
       .join("\n");
 
     console.log('AI:', aiReply);
+    if (createfile && aiReply) {
+      const fileName = `Response-${Date.now()}.txt`;
+      fs.writeFileSync(fileName, aiReply, "utf8");
+      console.log(`File created: ${fileName}`);
+
+      return res.json({
+       
+        file: {
+          name: fileName,
+          url: `http://localhost:4200/download/${fileName}`,
+        },
+      });
+    }
+
+
     res.json({ reply: aiReply });
 
   } catch (err) {
@@ -104,5 +124,13 @@ app.post("/api/chat", upload.array("file"), async (req, res) => {
   }
 });
 
+app.get("/download/:filename", (req, res) => {
+  const filePath = `./${req.params.filename}`;
+  if (fs.existsSync(filePath)) {
+    res.download(filePath);
+  } else {
+    res.status(404).json({ error: "File not found" });
+  }
+});
 const PORT = 4200;
 app.listen(PORT, () => console.log(`AI server running on port ${PORT}`));

@@ -276,6 +276,7 @@
     align-items: center;
     font-family: 'Montserrat',serif;
     margin-left: 20px;
+    align-self: center;
 }
 .warning
 {
@@ -323,4 +324,10 @@
 .deletebutton:hover
 {
     background-color: gray;
+}
+.checkbox
+{
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
 }
