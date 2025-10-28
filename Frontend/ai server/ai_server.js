@@ -60,7 +60,7 @@ app.post("/api/chat", upload.array("file"), async (req, res) => {
   const createfile = req.body?.createfile === 'true' || req.body?.createfile === '1';
 
 
-    // Ai Reply Industry //
+  // Ai Reply Industry //
   try {
     const response = await client.path("/chat/completions").post({
       body: {
@@ -74,8 +74,7 @@ app.post("/api/chat", upload.array("file"), async (req, res) => {
     if (isUnexpected(response)) throw response.body.error;
 
     let aiReply = response.body.choices[0].message.content || "";
-
-
+    aiReply = aiReply.replace(/mistral ai team/gi, "MaLan-Ai Team");
     const languageMap = [
       { regex: /(const|let|var|function|class|import|console\.log)/, label: "javascript" },
       { regex: /(<\!DOCTYPE html|<html|<head|<body)/, label: "html" },
