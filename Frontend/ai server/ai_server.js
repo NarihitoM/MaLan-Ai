@@ -107,7 +107,6 @@ app.post("/api/chat", upload.array("file"), async (req, res) => {
       console.log(`File created: ${fileName}`);
 
       return res.json({
-       
         file: {
           name: fileName,
           url: `http://localhost:4200/download/${fileName}`,
