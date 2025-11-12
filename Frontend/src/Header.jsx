@@ -28,7 +28,7 @@ function Header() {
     else {
       // change to const Handlevalidation = async (e) when using this ///
       try {
-        const response = await axios.post("http://localhost:5000/login", {
+        const response = await axios.post("https://malan-ai-db.vercel.app/api/login", {
           email: user,
           password: password,
         });
@@ -86,7 +86,7 @@ function Header() {
         headers: { Authorization: `Bearer ${response.access_token}` },
       });
       const profile = await userInfoRes.json();
-      const backendRes = await axios.post("http://localhost:5000/google-signup", {
+      const backendRes = await axios.post("https://malan-ai-db.vercel.app/api/google-login", {
         email: profile.email,
         name: profile.name,
         picture: profile.picture,
@@ -94,8 +94,8 @@ function Header() {
       });
       settext(backendRes.data.message);
       setbool(true);
-       localStorage.setItem("googleemail", backendRes.data.email);
-        localStorage.setItem("googlename", backendRes.data.name);
+        localStorage.setItem("googleemail", backendRes.data.email);
+        localStorage.setItem("googleusername", backendRes.data.username);
         localStorage.setItem("googlepicture",backendRes.data.picture);
         localStorage.setItem("keepLoggedIn", JSON.stringify(true));
         console.log("Google picture URL:", backendRes.data.picture);
@@ -139,7 +139,6 @@ function Header() {
           <h1 className="h1">MaLan-Ai</h1>
           <h2 className="h1">Login</h2>
           <input className="input" type="text" style={{ border: user === "" ? "2px solid gray" : emailRegex.test(user) ? "2px solid green" : "2px solid red" }} value={user} placeholder="Create Email" onChange={(e) => setuser(e.target.value)} />
-       
           <input className="input" type="password" style={{ border: password === "" ? "2px solid gray" : password.length >= 6 ? "2px solid green" : "2px solid red" }} value={password} placeholder="Enter password" onChange={(e) => setpassword(e.target.value)} />
           {bool && (
             <p className="p" style={{ color: text === "Login Successful" || text === "Google Login Successful" ? "green" : "red" }}>{text}</p>
@@ -169,7 +168,6 @@ function Header() {
             </div>
           )}
       </div>
-
     </>
   );
 }

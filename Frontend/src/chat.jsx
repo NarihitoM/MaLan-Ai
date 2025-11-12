@@ -20,6 +20,8 @@ function Chat() {
   const typewritingRef = useRef(null);
   const stopTypingRef = useRef(false);
   const [createfile, setcreatefile] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounter = useRef(0);
   useEffect(() => {
     const isuserinthesystem = localStorage.getItem("keepLoggedIn");
     if (isuserinthesystem) {
@@ -93,7 +95,7 @@ function Chat() {
           ...prev,
           {
             sender: "Bot",
-            text: "Here is the file created",
+            text: "Requested file is Ready",
             fileDownload: {
               name: data.file.name,
               url: data.file.url
@@ -174,12 +176,58 @@ function Chat() {
     setIsLoading(false);
   };
   useEffect(() => {
-    fovmessage.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messagetext]);
+    const container = fovmessage.current?.parentElement;
+    if (!container) return;
 
+    const isNearBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight < 40;
+
+    if (isNearBottom) {
+      fovmessage.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messagetext, istyping]);
   const deletefile = (index) => {
     setFile(prev => prev.filter((_, i) => i !== index));
   }
+  useEffect(() => {
+    const handleDragEnter = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounter.current++;
+      setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounter.current--;
+      if (dragCounter.current === 0) setIsDragging(false);
+    };
+
+    const handleDrop = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounter.current = 0;
+      setIsDragging(false);
+      const droppedFiles = Array.from(e.dataTransfer.files);
+      setFile((prev) => [...prev, ...droppedFiles]);
+    };
+
+    window.addEventListener("dragenter", handleDragEnter);
+    window.addEventListener("dragleave", handleDragLeave);
+    window.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    window.addEventListener("drop", handleDrop);
+
+    return () => {
+      window.removeEventListener("dragenter", handleDragEnter);
+      window.removeEventListener("dragleave", handleDragLeave);
+      window.removeEventListener("dragover", (e) => e.preventDefault());
+      window.removeEventListener("drop", handleDrop);
+    };
+  }, []);
   return (
     <>
       <div className="head">
@@ -192,7 +240,7 @@ function Chat() {
             {isLoggedin ? (
               <>
                 <h1 className="h1pf1">{localStorage.getItem("email")}</h1>
-                <h1 className="h1pf">{localStorage.getItem("googlename")}</h1>
+                <h1 className="h1pf">{localStorage.getItem("googleusername")}</h1>
                 <button className="gotologinpage" onClick={logout}>
                   Logout
                 </button>
@@ -238,11 +286,23 @@ function Chat() {
                 </p>
               </div>
             ))}
+            {isLoading && !istyping && (
+              <div className="chatmessage bot-typing">
+                <div className="typing-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            )}
             <div ref={fovmessage}></div>
           </div>
           <div className="row1">
             <h1 className="copyright">@Copyright 2025 MaLan-AI</h1>
+           
             <div className="input-area">
+            {isLoggedin ?
+              (<>
               <label className="checkbox">
                 <input
                   type="checkbox"
@@ -261,6 +321,9 @@ function Chat() {
                     if (e.key === "Enter" && userInput.trim() !== "" && !isLoading) {
                       if (istyping) stopgenerate();
                       else send();
+                      setTimeout(() => {
+                        fovmessage.current?.scrollIntoView({ behavior: "smooth" });
+                      }, 100);
                     }
                   }}
                   placeholder="Ask Anything..."
@@ -272,6 +335,9 @@ function Chat() {
                     if (e.target.files.length > 0) {
                       setFile((prev) => [...prev, ...Array.from(e.target.files)]);
                     }
+                      setTimeout(() => {
+                        fovmessage.current?.scrollIntoView({ behavior: "smooth" });
+                      }, 100);
                   }}
                   multiple
                   style={{ display: "none" }}
@@ -284,6 +350,9 @@ function Chat() {
                   onClick={() => {
                     if (istyping) stopgenerate();
                     else send();
+                      setTimeout(() => {
+                        fovmessage.current?.scrollIntoView({ behavior: "smooth" });
+                      }, 100);
                   }}
                   disabled={(userInput.trim() === "" && file.length === 0) || isLoading}
                 >
@@ -297,7 +366,13 @@ function Chat() {
                 </button>
 
               </div>
-
+               {isDragging && (
+                <div className="drag-overlay">
+                  <div className="drop-zone">
+                    <p>📎Drop files here to upload...</p>
+                  </div>
+                </div>
+              )}
               {file.length > 0 && (
                 <div className="files-container">
                   {file.map((file, index) => (
@@ -310,6 +385,10 @@ function Chat() {
                   ))}
                 </div>
               )}
+              </>) : 
+              (<>
+               <h1 className="warning">Please Log In or SignUp to continue</h1>
+              </>)}
             </div>
           </div>
         </div>

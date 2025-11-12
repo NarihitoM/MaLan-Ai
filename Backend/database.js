@@ -14,6 +14,7 @@ const db = mysql.createConnection({
     password: process.env.PASSWORD,
     database: process.env.DATABASE,
 });
+
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   db.query(

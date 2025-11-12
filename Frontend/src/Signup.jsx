@@ -29,7 +29,7 @@ function Signup() {
     } else {
        try 
        {
-      const response = await axios.post("http://localhost:5000/signup", {
+      const response = await axios.post("https://malan-ai-db.vercel.app/api/signup", {
         email: email,
         password: password,
       });
@@ -56,7 +56,7 @@ function Signup() {
         headers: { Authorization: `Bearer ${response.access_token}` },
       });
       const profile = await userInfoRes.json();
-      const backendRes = await axios.post("http://localhost:5000/google-signup", {
+      const backendRes = await axios.post("https://malan-ai-db.vercel.app/api/google-login", {
         email: profile.email,
         name: profile.name,
         picture: profile.picture,
@@ -64,8 +64,8 @@ function Signup() {
       });
       settext(backendRes.data.message);
       setbool(true);
-       localStorage.setItem("googleemail", backendRes.data.email);
-        localStorage.setItem("googlename", backendRes.data.name);
+        localStorage.setItem("googleemail", backendRes.data.email);
+        localStorage.setItem("googleusername", backendRes.data.username);
         localStorage.setItem("googlepicture",backendRes.data.picture);
         localStorage.setItem("keepLoggedIn", JSON.stringify(true));
         console.log("Google picture URL:", backendRes.data.picture);
