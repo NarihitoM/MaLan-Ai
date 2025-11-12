@@ -67,6 +67,7 @@ function Signup() {
         localStorage.setItem("googleemail", backendRes.data.email);
         localStorage.setItem("googleusername", backendRes.data.username);
         localStorage.setItem("googlepicture",backendRes.data.picture);
+        localStorage.setItem("token",backendRes.data.token);
         localStorage.setItem("keepLoggedIn", JSON.stringify(true));
         console.log("Google picture URL:", backendRes.data.picture);
       setTimeout(() => {

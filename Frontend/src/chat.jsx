@@ -76,7 +76,7 @@ function Chat() {
     }
     //Ai Response Industry//
     try {
-      const resp = await fetch("http://localhost:4200/api/chat", fetchOptions);
+      const resp = await fetch("https://malan-ai-server.vercel.app/api/chat", fetchOptions);
 
       if (resp.ok) setFile([]);
 
@@ -84,26 +84,35 @@ function Chat() {
         const errBody = await resp.json().catch(() => ({}));
         throw new Error(errBody.error || `Server returned ${resp.status}`);
       }
+      const contentType = resp.headers.get("Content-Type");
 
-      const data = await resp.json();
-      const botReply = data.reply || "No response from server";
+      if (contentType && contentType.includes("text/plain")) {
+     
+        const blob = await resp.blob();
+        const fileName =
+          resp.headers.get("Content-Disposition")?.match(/filename="(.+)"/)?.[1] ||
+          "Malan-Ai.txt";
+        const fileURL = window.URL.createObjectURL(blob);
 
-      if (stopTypingRef.current) return;
-
-      if (data.file?.url) {
         setmessagetext((prev) => [
           ...prev,
           {
             sender: "Bot",
-            text: "Requested file is Ready",
+            text: "Your File is here",
             fileDownload: {
-              name: data.file.name,
-              url: data.file.url
-            }
+              name: fileName,
+              url: fileURL,
+            },
           },
         ]);
+        setistyping(false);
+        setIsLoading(false);
         return;
       }
+ 
+      const data = await resp.json();
+      const botReply = data.reply || "No response from server";
+
       setistyping(true);
       let index = 0;
       const typingspeed = 30;
@@ -299,96 +308,96 @@ function Chat() {
           </div>
           <div className="row1">
             <h1 className="copyright">@Copyright 2025 MaLan-AI</h1>
-           
-            <div className="input-area">
-            {isLoggedin ?
-              (<>
-              <label className="checkbox">
-                <input
-                  type="checkbox"
-                  checked={createfile}
-                  onChange={(e) => setcreatefile(e.target.checked)}
-                />
-                Create file
-              </label>
-              <div className="input-row">
-                <input
-                  className="input1"
-                  type="text"
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && userInput.trim() !== "" && !isLoading) {
-                      if (istyping) stopgenerate();
-                      else send();
-                      setTimeout(() => {
-                        fovmessage.current?.scrollIntoView({ behavior: "smooth" });
-                      }, 100);
-                    }
-                  }}
-                  placeholder="Ask Anything..."
-                />
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={(e) => {
-                    if (e.target.files.length > 0) {
-                      setFile((prev) => [...prev, ...Array.from(e.target.files)]);
-                    }
-                      setTimeout(() => {
-                        fovmessage.current?.scrollIntoView({ behavior: "smooth" });
-                      }, 100);
-                  }}
-                  multiple
-                  style={{ display: "none" }}
-                />
-                <button className="upload-btn" onClick={() => fileInputRef.current?.click()}>
-                  📎
-                </button>
-                <button
-                  className="button"
-                  onClick={() => {
-                    if (istyping) stopgenerate();
-                    else send();
-                      setTimeout(() => {
-                        fovmessage.current?.scrollIntoView({ behavior: "smooth" });
-                      }, 100);
-                  }}
-                  disabled={(userInput.trim() === "" && file.length === 0) || isLoading}
-                >
-                  {istyping ? (
-                    <div className="circle"></div>
-                  ) : isLoading ? (
-                    "Send"
-                  ) : (
-                    "Send"
-                  )}
-                </button>
 
-              </div>
-               {isDragging && (
-                <div className="drag-overlay">
-                  <div className="drop-zone">
-                    <p>📎Drop files here to upload...</p>
+            <div className="input-area">
+              {isLoggedin ?
+                (<>
+                  <label className="checkbox">
+                    <input
+                      type="checkbox"
+                      checked={createfile}
+                      onChange={(e) => setcreatefile(e.target.checked)}
+                    />
+                    Create file
+                  </label>
+                  <div className="input-row">
+                    <input
+                      className="input1"
+                      type="text"
+                      value={userInput}
+                      onChange={(e) => setUserInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && userInput.trim() !== "" && !isLoading) {
+                          if (istyping) stopgenerate();
+                          else send();
+                          setTimeout(() => {
+                            fovmessage.current?.scrollIntoView({ behavior: "smooth" });
+                          }, 100);
+                        }
+                      }}
+                      placeholder="Ask Anything..."
+                    />
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={(e) => {
+                        if (e.target.files.length > 0) {
+                          setFile((prev) => [...prev, ...Array.from(e.target.files)]);
+                        }
+                        setTimeout(() => {
+                          fovmessage.current?.scrollIntoView({ behavior: "smooth" });
+                        }, 100);
+                      }}
+                      multiple
+                      style={{ display: "none" }}
+                    />
+                    <button className="upload-btn" onClick={() => fileInputRef.current?.click()}>
+                      📎
+                    </button>
+                    <button
+                      className="button"
+                      onClick={() => {
+                        if (istyping) stopgenerate();
+                        else send();
+                        setTimeout(() => {
+                          fovmessage.current?.scrollIntoView({ behavior: "smooth" });
+                        }, 100);
+                      }}
+                      disabled={(userInput.trim() === "" && file.length === 0) || isLoading}
+                    >
+                      {istyping ? (
+                        <div className="circle"></div>
+                      ) : isLoading ? (
+                        "Send"
+                      ) : (
+                        "Send"
+                      )}
+                    </button>
+
                   </div>
-                </div>
-              )}
-              {file.length > 0 && (
-                <div className="files-container">
-                  {file.map((file, index) => (
-                    <>
-                      <p key={index} className="filename">
-                        <i class="fa-solid fa-file"></i> {file.name}
-                      </p>
-                      <button className="deletebutton" onClick={() => deletefile(index)}>x</button>
-                    </>
-                  ))}
-                </div>
-              )}
-              </>) : 
-              (<>
-               <h1 className="warning">Please Log In or SignUp to continue</h1>
-              </>)}
+                  {isDragging && (
+                    <div className="drag-overlay">
+                      <div className="drop-zone">
+                        <p>📎Drop files here to upload...</p>
+                      </div>
+                    </div>
+                  )}
+                  {file.length > 0 && (
+                    <div className="files-container">
+                      {file.map((file, index) => (
+                        <>
+                          <p key={index} className="filename">
+                            <i class="fa-solid fa-file"></i> {file.name}
+                          </p>
+                          <button className="deletebutton" onClick={() => deletefile(index)}>x</button>
+                        </>
+                      ))}
+                    </div>
+                  )}
+                </>) :
+                (<>
+                  <h1 className="warning">Please Log In or SignUp to continue</h1>
+                </>)}
             </div>
           </div>
         </div>
