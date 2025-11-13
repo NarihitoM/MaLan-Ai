@@ -1,1 +1,0 @@
-to start run "npm start" in cmd dont forgot to link mysql server or cloud server
